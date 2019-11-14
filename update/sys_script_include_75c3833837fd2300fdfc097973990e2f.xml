@@ -1,0 +1,1514 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_nuta2_nutanix_ca.Nutanix_ConfigureSettingScripts</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Nutanix_ConfigureSettingScripts</name>
+        <script><![CDATA[var Nutanix_ConfigureSettingScripts = Class.create();
+Nutanix_ConfigureSettingScripts.prototype = {
+    initialize: function() {
+		this.appUtil = new Nutanix_Calm_Utils();
+		this.logger = new Nutanix_Calm_Logger();
+    },
+	
+	
+	setServiceVariables: function( current ){
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts.setServiceVariables.");			
+			
+			var performAction = current.variables.type+'';
+
+			var catName = '';
+			
+			if(performAction == 'new'){
+				var profile = current.variables.application_profile;
+				var blueprint = current.variables.blueprint;
+				var catSysId = current.description;
+				var service_data = JSON.parse(current.variables.service_data);
+
+				this.logger.debug("Got Profile:- "+profile+" Blueprint:- "+blueprint+" Catalog Item:- "+catSysId+" and Service Variables Data:- "+current.variables.service_data+" for setting service variables");			
+				
+				var fieldGR = new GlideRecord(this.appUtil.configuration.table.varaiblesTable+'');
+				fieldGR.addEncodedQuery('cat_item=' + catSysId);
+				fieldGR.query();
+				
+				var fieldInfo = {};
+				
+				while(fieldGR.next()){
+					fieldInfo[fieldGR.name] = fieldGR.sys_id+'';
+				}
+				
+				this.logger.debug("Fethed the mapping of fields to sysIds. JSON string:- "+JSON.stringify(fieldInfo));			
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+				
+				for(var i in service_data){
+					var serviceName = i;
+					var categoryList = service_data[i];
+					
+					for(var j in categoryList){
+						var categoryName = j;
+						var category = categoryList[j];			
+						/*
+						if(categoryName.indexOf('storage') != -1){
+							var keys = Object.keys(category);
+							
+							this.logger.debug("Mapping Storage variables "+JSON.stringify(category[keys[0]])+" in Varaibles properties table");
+							
+							gr.initialize();
+							gr.variable = fieldInfo[categoryName+'']+'';
+							gr.application_profile = profile+'';
+							gr.catalog_item = catSysId+'';
+							gr.default_value = JSON.stringify(category[keys[0]]);
+							gr.isprofilevariable = 'false';
+							gr.runtime_config = 'false';
+							gr.uuid = '';
+							gr.service_name = fieldInfo[serviceName+'']+'';
+							gr.category_name = fieldInfo[categoryName+'']+'';
+							gr.insert();
+							
+						}else if(categoryName.indexOf('port') != -1){
+							var keys = Object.keys(category);
+							
+							this.logger.debug("Mapping PortList variables "+JSON.stringify(category[keys[0]])+" in Varaibles properties table");
+							
+							gr.initialize();
+							gr.variable = fieldInfo[categoryName+'']+'';
+							gr.application_profile = profile+'';
+							gr.catalog_item = catSysId+'';
+							gr.default_value = JSON.stringify(category[keys[0]]);
+							gr.isprofilevariable = 'false';
+							gr.runtime_config = 'false';
+							gr.uuid = '';
+							gr.service_name = fieldInfo[serviceName+'']+'';
+							gr.category_name = fieldInfo[categoryName+'']+'';
+							gr.insert();
+							
+						}*/
+						
+						var keys = Object.keys(category);
+						
+						if(!category[keys[0]].notCmplx || category[keys[0]].notCmplx+''=='false'){
+
+							this.logger.debug("Mapping PortList variables "+JSON.stringify(category[keys[0]])+" in Varaibles properties table");
+
+							gr.initialize();
+							gr.variable = fieldInfo[categoryName+'']+'';
+							gr.application_profile = profile+'';
+							gr.catalog_item = catSysId+'';
+							gr.default_value = JSON.stringify(category[keys[0]]);
+							gr.isprofilevariable = 'false';
+							gr.runtime_config = 'false';
+							gr.uuid = '';
+							gr.service_name = fieldInfo[serviceName+'']+'';
+							gr.category_name = fieldInfo[categoryName+'']+'';
+							gr.insert();
+							
+						}else{
+							for(var k in category){
+								var varia = category[k];
+
+								this.logger.debug("Mapping service variable "+varia.name+" with value "+varia.value+" and runtime config as "+varia.runtime_config+" againsts service "+serviceName+" and category "+categoryName+" in Varaibles properties table");
+								
+								gr.initialize();
+								gr.variable = fieldInfo[varia.name+'']+'';
+								gr.application_profile = profile+'';
+								gr.catalog_item = catSysId+'';
+								gr.default_value = varia.value+'';
+								gr.isprofilevariable = varia.isprofilevariable+'';
+								gr.runtime_config = varia.runtime_config+'';
+								gr.uuid = varia.uuid+'';
+								gr.service_name = fieldInfo[serviceName+'']+'';
+								gr.category_name = fieldInfo[categoryName+'']+'';
+								
+								gr.isdisabled = varia.isdisabled+'';
+								gr.issupported = varia.isSupported+'';
+								gr.isservicevariable = varia.isservicevariable+'';
+								
+								gr.insert();
+								
+								catName = gr.catalog_item.name+'';
+							}	
+						}
+						
+					}
+				}
+				
+				this.logger.info("Set service variables values for "+catName+".");
+				
+			}else{
+				
+				var profile = current.variables.application_profile+'';
+				var catSysId = current.variables.cat_item+'';
+				
+				var service_data = JSON.parse(current.variables.service_data+'');
+				
+				this.logger.debug("Got Profile:- "+profile+" Catalog Item:- "+catSysId+" and Service Variables Data:- "+current.variables.service_data+" to update service variables.");			
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+				gr.addQuery('catalog_item', catSysId);
+				gr.addQuery('application_profile', profile);
+				gr.addQuery('isprofilevariable', false);
+				gr.query();
+				
+				while(gr.next()){
+					/*if((gr.category_name.name+'').indexOf('storage') != -1){
+						gr.default_value = JSON.stringify(service_data[gr.service_name.name+''][gr.category_name.name+''][gr.sys_id+'']);
+						gr.update();	
+						this.logger.debug("Updated service storage variable "+ gr.default_value);
+					}else if((gr.category_name.name+'').indexOf('port') != -1){
+						gr.default_value = JSON.stringify(service_data[gr.service_name.name+''][gr.category_name.name+''][gr.sys_id+'']);
+						gr.update();	
+						this.logger.debug("Updated service port list "+ gr.default_value);
+					}*/
+					
+					
+					var jsonData = service_data[gr.service_name.name+''][gr.category_name.name+''][gr.sys_id+''];							
+					
+					if(!jsonData.notCmplx || jsonData.notCmplx+''=='false'){
+						gr.default_value = JSON.stringify(service_data[gr.service_name.name+''][gr.category_name.name+''][gr.sys_id+'']);
+						gr.update();	
+						this.logger.debug("Updated service port list "+ gr.default_value);
+					}else{						
+						gr.default_value = service_data[gr.service_name.name+''][gr.category_name.name+''][gr.sys_id+''].value+'';
+						gr.runtime_config = service_data[gr.service_name.name+''][gr.category_name.name+''][gr.sys_id+''].runtime_config+'';
+						gr.update();	
+						
+						this.logger.debug("Updated service variable "+gr.variable.name+" with value "+gr.default_value+" and runtime config as "+gr.runtime_config+" againsts service "+gr.service_name.name+" and category "+gr.category_name.name+" in Variables properties table");
+						catName = gr.catalog_item.name+'';
+						
+					}
+				}
+					
+				this.logger.info("Updated service variables values for "+catName+".");
+			}
+				
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts.setServiceVariables. Error:- "+e);
+		}
+	},
+	
+	setProfileVariables: function( current ){
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts.setProfileVariables.");			
+			this.logger.info("Setting profile variables properties.");		
+			
+			var performAction = current.variables.type+'';
+			var catName = '';
+			if(performAction == 'new'){
+				var profile = current.variables.application_profile;
+				var blueprint = current.variables.blueprint;
+				var catSysId = current.description;
+				var variable_data = JSON.parse(current.variables.variable_data);
+
+				this.logger.debug("Got Profile:- "+profile+" Blueprint:- "+blueprint+" Catalog Item:- "+catSysId+" and Service Variables Data:- "+current.variables.variable_data+" for setting profile variables");			
+				
+				var fieldGR = new GlideRecord(this.appUtil.configuration.table.varaiblesTable+'');
+				fieldGR.addEncodedQuery('cat_item=' + catSysId + '^type!=19^type!=20');
+				fieldGR.query();
+				
+				var fieldInfo = {};
+				
+				while(fieldGR.next()){
+					fieldInfo[fieldGR.name] = fieldGR.sys_id+'';
+				}
+				
+				this.logger.debug("Fethed the mapping of fields to sysIds. JSON string:- "+JSON.stringify(fieldInfo));			
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+				
+				for(var i in variable_data){
+					var varia = variable_data[i];
+					
+					gr.initialize();
+					gr.application_profile = profile+'';
+					gr.catalog_item = catSysId+'';
+					gr.default_value = varia.value+'';
+					gr.isprofilevariable = varia.isprofilevariable+'';
+					gr.runtime_config = varia.runtime_config+'';
+					gr.uuid = varia.uuid+'';
+					gr.variable = fieldInfo[varia.name+'']+'';
+					gr.isdisabled = varia.isdisabled+'';
+					gr.insert();
+					catName = gr.catalog_item.name+'';
+					this.logger.debug("Mapping profile variable "+varia.name+" with value "+varia.value+" and runtime config as "+varia.runtime_config+" againsts profile "+gr.application_profile.name+" in Variables properties table");
+				}
+				
+				this.logger.info("Set profile variables values for "+catName+".");
+			}else{
+				
+				var profile = current.variables.application_profile+'';
+				var catSysId = current.variables.cat_item+'';
+				
+				var variable_data = JSON.parse(current.variables.variable_data+'');
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+				gr.addQuery('catalog_item', catSysId);
+				gr.addQuery('application_profile', profile);
+				gr.addQuery('isprofilevariable', true);
+				gr.query();
+				
+				while(gr.next()){
+					gr.default_value = variable_data[gr.sys_id+''].value+'';
+					gr.runtime_config = variable_data[gr.sys_id+''].runtime_config+'';
+					gr.update();
+					catName = gr.catalog_item.name+'';
+					this.logger.debug("Updated profile variable "+gr.variable.name+" with value "+gr.default_value+" and runtime config as "+gr.runtime_config+" againsts profile "+gr.application_profile.name+" in Variables properties table");
+				}
+							
+				this.logger.info("Updated profile variables values for "+catName+".");
+			}
+				
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts.setProfileVariables. Error:- "+e);
+		}
+	},
+
+	setCredentialsData: function(current){
+		
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts.setCredentialsData.");			
+			
+			var catSysId = current.description;
+			var catName = '';
+			var performAction = current.variables.type+'';
+
+			if(performAction == 'new'){
+				var blueprint = current.variables.blueprint;
+				var variable_data = JSON.parse(current.variables.credentials_data);
+
+				this.logger.debug("Got Blueprint:- "+blueprint+" Catalog Item:- "+catSysId+" and Credentials Data:- "+current.variables.credentials_data+" for setting credetnails.");			
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.Credentials+'');
+
+				for(var i in  variable_data){
+					var varia = variable_data[i];
+
+					gr.initialize();
+
+					gr.catalog_item = catSysId+'';
+					gr.actual_name = i+'';
+					gr.description = varia.description+'';
+					gr.is_default = varia.is_default+'';
+					gr.is_secret_modified = varia.is_secret_modified+'';
+					gr.name = varia.credential_name.value+'';
+					gr.passphrase = (varia.passphrase)?varia.passphrase.value+'':'';
+					gr.passphrase_editable = (varia.passphrase)?varia.passphrase.runtime_config+'':'';
+					gr.password = (varia.password)?varia.password.value+'':'';
+					gr.secret_editable = (varia.password)?varia.password.runtime_config+'':'';
+					gr.ssh_private_key = (varia.ssh_private_key)?varia.ssh_private_key.value+'':'';
+					gr.ssh_private_key_editable = (varia.ssh_private_key)?varia.ssh_private_key.runtime_config+'':'';
+					gr.state = varia.state+'';
+					gr.type = varia.secret_type.value+'';
+					gr.username = varia.username.value+'';
+					gr.username_editable = varia.username.runtime_config+'';
+					gr.uuid = varia.uuid+'';
+					
+					gr.username_isdisabled = varia.username_isdisabled+'';
+					gr.secret_isdisabled = varia.secret_isdisabled+'';
+					gr.ssh_private_key_isdisabled = varia.ssh_private_key_isdisabled+'';
+					gr.passphrase_isdisabled = varia.passphrase_isdisabled+'';				 
+					
+					gr.credential_reference = varia.credential_reference.value+'';				 
+					gr.runtime = varia.runtime+'';				 
+
+					gr.insert();
+					
+					catName = gr.catalog_item.name+'';
+					this.logger.debug("Mapped credentials data against catalog item "+gr.catalog_item);
+				}
+				
+// 				var gr = new GlideRecord(this.appUtil.configuration.table.variableSetTable+'');
+// 				gr.addQuery('variable_set', gs.getProperty('x_nuta2_nutanix_ca.credentials.variable.set')+'');
+// 				gr.addQuery('sc_cat_item', catSysId+'');
+// 				gr.query();
+				
+// 				if(!gr.hasNext()){
+// 					gr.initialize();
+// 					gr.variable_set = gs.getProperty('x_nuta2_nutanix_ca.credentials.variable.set')+'';
+// 					gr.sc_cat_item = catSysId+''; 
+// 					gr.order = '51001';
+// 					gr.insert();	
+// 				}
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+				gr.addQuery('variable', gs.getProperty('x_nuta2_nutanix_ca.credentials.mapping.variable.sys.id')+'');
+				gr.addQuery('catalog_item', catSysId+'');
+				gr.query();
+				
+				if(gr.next()){
+					gr.default_value = current.variables.environment_mapping;
+					gr.update();
+				}else{
+					gr.initialize();
+					gr.variable = gs.getProperty('x_nuta2_nutanix_ca.credentials.mapping.variable.sys.id')+'';
+					gr.application_profile = '';
+					gr.catalog_item = catSysId+'';
+					gr.default_value = current.variables.environment_mapping;
+					gr.isprofilevariable = false;
+					gr.runtime_config = false;
+					gr.uuid = '';
+					gr.service_name = '';
+					gr.category_name = '';
+					gr.insert();
+				}
+				
+// 				if(current.variables.environment_mapping+'' == 'true'){
+// 					var mapping_data = JSON.parse(current.variables.credentials_mapping);
+										
+// 					for(var i in mapping_data){
+						
+// 						var varia = mapping_data[i];
+						
+// 						var gr = new GlideRecord(this.appUtil.configuration.table.Credentials+'');
+// 						gr.addQuery('catalog_item', catSysId+'');
+// 						gr.addQuery('environment', varia.environment+'');
+// 						gr.addQuery('project', varia.project+'');
+// 						gr.query();
+						
+// 						if(!gr.hasNext()){
+// 							gr.initialize();
+
+// 							gr.catalog_item = catSysId+'';
+// 							gr.actual_name = i+'';
+// 							gr.description = varia.description+'';
+// 							gr.is_default = varia.is_default+'';
+// 							gr.is_secret_modified = varia.is_secret_modified+'';
+// 							gr.name = varia.credential_name.value+'';
+// 							gr.passphrase = (varia.passphrase)?varia.passphrase.value+'':'';
+// 							gr.passphrase_editable = (varia.passphrase)?varia.passphrase.runtime_config+'':'';
+// 							gr.password = (varia.password)?varia.password.value+'':'';
+// 							gr.secret_editable = (varia.password)?varia.password.runtime_config+'':'';
+// 							gr.ssh_private_key = (varia.ssh_private_key)?varia.ssh_private_key.value+'':'';
+// 							gr.ssh_private_key_editable = (varia.ssh_private_key)?varia.ssh_private_key.runtime_config+'':'';
+// 							gr.state = varia.state+'';
+// 							gr.type = varia.secret_type.value+'';
+// 							gr.username = varia.username.value+'';
+// 							gr.username_editable = varia.username.runtime_config+'';
+// 							gr.uuid = varia.uuid+'';
+// 							gr.environment = varia.environment+'';
+// 							gr.project = varia.project+'';
+							
+// 							gr.username_isdisabled = varia.username_isdisabled+'';
+// 							gr.secret_isdisabled = varia.secret_isdisabled+'';
+// 							gr.ssh_private_key_isdisabled = varia.ssh_private_key_isdisabled+'';
+// 							gr.passphrase_isdisabled = varia.passphrase_isdisabled+'';				 
+
+// 							gr.insert();	
+// 						}
+// 					}
+// 				}
+				
+				this.logger.info("Set profile variables values for "+catName+".");
+			}else{
+				var catSysId = current.variables.cat_item+'';
+				var variable_data = JSON.parse(current.variables.credentials_data);
+
+				for(var i in  variable_data){
+					var varia = variable_data[i];
+
+					var gr = new GlideRecord(this.appUtil.configuration.table.Credentials+'');
+					gr.addQuery('catalog_item=' + catSysId + '^uuid='+varia.uuid);
+					gr.query();
+
+					if(gr.next()){
+						gr.catalog_item = catSysId+'';
+						gr.description = varia.description+'';
+						gr.is_default = varia.is_default+'';
+						gr.is_secret_modified = varia.is_secret_modified+'';
+						gr.name = varia.credential_name.value+'';
+						gr.passphrase = (varia.passphrase)?varia.passphrase.value+'':'';
+						gr.passphrase_editable = (varia.passphrase)?varia.passphrase.runtime_config+'':'';
+						gr.password = (varia.password)?varia.password.value+'':'';
+						gr.secret_editable = (varia.password)?varia.password.runtime_config+'':'';
+						gr.ssh_private_key = (varia.ssh_private_key)?varia.ssh_private_key.value+'':'';
+						gr.ssh_private_key_editable = (varia.ssh_private_key)?varia.ssh_private_key.runtime_config+'':'';
+						gr.state = varia.state+'';
+						gr.type = varia.secret_type.value+'';
+						gr.username = varia.username.value+'';
+						gr.username_editable = varia.username.runtime_config+'';
+						gr.uuid = varia.uuid+'';
+						
+						gr.username_isdisabled = varia.username_isdisabled+'';
+						gr.secret_isdisabled = varia.secret_isdisabled+'';
+						gr.ssh_private_key_isdisabled = varia.ssh_private_key_isdisabled+'';
+						gr.passphrase_isdisabled = varia.passphrase_isdisabled+'';
+						
+						gr.credential_reference = varia.credential_reference.value+'';		
+						gr.runtime = varia.runtime+'';				 
+
+						gr.update();	
+						catName = gr.catalog_item.name+'';
+						this.logger.debug("Updated credentials data against catalog item "+gr.catalog_item);
+					}
+				}
+
+// 				var gr = new GlideRecord(this.appUtil.configuration.table.variableSetTable+'');
+// 				gr.addQuery('variable_set', gs.getProperty('x_nuta2_nutanix_ca.credentials.variable.set')+'');
+// 				gr.addQuery('sc_cat_item', catSysId+'');
+// 				gr.query();
+
+// 				if(!gr.hasNext()){
+// 					gr.initialize();
+// 					gr.variable_set = gs.getProperty('x_nuta2_nutanix_ca.credentials.variable.set')+'';
+// 					gr.sc_cat_item = catSysId+''; 
+// 					gr.order = '51001';
+// 					gr.insert();	
+// 				}
+
+				var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+				gr.addQuery('variable', gs.getProperty('x_nuta2_nutanix_ca.credentials.mapping.variable.sys.id')+'');
+				gr.addQuery('catalog_item', catSysId+'');
+				gr.query();
+
+				if(gr.next()){
+					gr.default_value = current.variables.environment_mapping;
+					gr.update();
+				}else{
+					gr.initialize();
+					gr.variable = gs.getProperty('x_nuta2_nutanix_ca.credentials.mapping.variable.sys.id')+'';
+					gr.application_profile = '';
+					gr.catalog_item = catSysId+'';
+					gr.default_value = current.variables.environment_mapping;
+					gr.isprofilevariable = false;
+					gr.runtime_config = false;
+					gr.uuid = '';
+					gr.service_name = '';
+					gr.category_name = '';
+					gr.insert();
+				}
+
+// 				if(current.variables.environment_mapping+'' == 'true'){
+// 					var mapping_data = JSON.parse(current.variables.credentials_mapping);
+
+// 					for(var i in mapping_data){
+
+// 						var varia = mapping_data[i];
+
+// 						var gr = new GlideRecord(this.appUtil.configuration.table.Credentials+'');
+// 						gr.addQuery('catalog_item', catSysId+'');
+// 						gr.addQuery('environment', varia.environment+'');
+// 						gr.addQuery('project', varia.project+'');
+// 						gr.query();
+
+// 						if(!gr.hasNext()){
+// 							gr.initialize();
+
+// 							gr.catalog_item = catSysId+'';
+// 							gr.actual_name = i+'';
+// 							gr.description = varia.description+'';
+// 							gr.is_default = varia.is_default+'';
+// 							gr.is_secret_modified = varia.is_secret_modified+'';
+// 							gr.name = varia.credential_name.value+'';
+// 							gr.passphrase = (varia.passphrase)?varia.passphrase.value+'':'';
+// 							gr.passphrase_editable = (varia.passphrase)?varia.passphrase.runtime_config+'':'';
+// 							gr.password = (varia.password)?varia.password.value+'':'';
+// 							gr.secret_editable = (varia.password)?varia.password.runtime_config+'':'';
+// 							gr.ssh_private_key = (varia.ssh_private_key)?varia.ssh_private_key.value+'':'';
+// 							gr.ssh_private_key_editable = (varia.ssh_private_key)?varia.ssh_private_key.runtime_config+'':'';
+// 							gr.state = varia.state+'';
+// 							gr.type = varia.secret_type.value+'';
+// 							gr.username = varia.username.value+'';
+// 							gr.username_editable = varia.username.runtime_config+'';
+// 							gr.uuid = varia.uuid+'';
+// 							gr.environment = varia.environment+'';
+// 							gr.project = varia.project+'';
+							
+// 							gr.username_isdisabled = varia.username_isdisabled+'';
+// 							gr.secret_isdisabled = varia.secret_isdisabled+'';
+// 							gr.ssh_private_key_isdisabled = varia.ssh_private_key_isdisabled+'';
+// 							gr.passphrase_isdisabled = varia.passphrase_isdisabled+'';				 
+
+// 							gr.insert();	
+// 						}
+// 					}
+// 				}
+				
+				this.logger.info("Updated credentials values for "+catName+".");
+			}
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts.setCredentialsData. Error:- "+e);
+		}		
+	},
+	
+	configBPGeneralSettings: function( current ){
+		
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts.configBPGeneralSettings.");			
+
+			var performAction = current.variables.type+'';
+
+			if(performAction == 'new'){
+				var blueprint = current.variables.blueprint+'';
+				var blueprintType = current.variables.type_of_blueprint+'';
+				var createCatalog = current.variables.create_catalog+'';
+				
+				this.logger.debug("Got Blueprint:- "+blueprint+" Blueprint Type:- "+blueprintType+" and Create Catalog:- "+createCatalog+" for configuring new catalog item.");			
+				
+				var targetCatTable = 'x_nuta2_nutanix_ca_nutanix_catalog_items';
+				var sourceCatTable = '';
+				if(blueprintType == 'unpublished')
+					sourceCatTable = 'x_nuta2_nutanix_ca_nutanix_blueprint';
+				else
+					sourceCatTable = 'x_nuta2_nutanix_ca_nutanix_marketplaceitems';				
+				
+				var ans;
+				if(createCatalog == 'yes') 
+					ans = this._copyCatalogItem(sourceCatTable, targetCatTable, blueprint, current, blueprintType);
+				else
+					ans = this._updateCatalogItem(sourceCatTable, targetCatTable, blueprint, current);
+
+				this._insertIntoRuntimeConfigTable(ans, current);
+				
+				this._updateUserOverCalm(current);
+				this._updateGroupOverCalm(current);
+				return ans[0]+'';
+			}else{
+
+				var cat_item = current.variables.cat_item+'';
+				
+				this.logger.debug("Got Catalog Item:- "+cat_item+" for updating existing catalog item.");			
+				
+				var gr = new GlideRecord(this.appUtil.configuration.table.runtimeConfig+'');
+				gr.addQuery('item_name', cat_item);
+				gr.query();
+				
+				if(gr.next()){
+					var cat = gr.item_name.getRefRecord();
+					cat.sys_name = current.variables.item_name+'';
+					cat.name = current.variables.item_name+'';
+					cat.short_description = current.variables.item_name+'';
+					cat.description = current.variables.description+'';
+					cat.update();
+					
+					var user_criteria = gr.user_criteria.getRefRecord();
+					user_criteria.user = current.variables.assign_users;
+					user_criteria.group = current.variables.assign_groups;
+					user_criteria.update();
+					
+					this._updateUserOverCalm(current);
+					this._updateGroupOverCalm(current);
+					
+					return gr.item_name+'';
+				}
+				
+			}
+			
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts.configBPGeneralSettings. Error:- "+e);
+		}
+	},
+	
+	_checkUsersUUID: function(current){
+		try{		
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._checkUsersUUID.");			
+					
+			var userGr = new GlideRecord('sys_user');
+			userGr.addEncodedQuery('sys_idIN'+current.variables.assign_users+'^x_nuta2_nutanix_ca_nutanix_uuidISEMPTY');				
+			userGr.query();
+			
+			while(userGr.next()){
+			
+				var ldapGR = new GlideRecord('ldap_server_config');
+				ldapGR.get(userGr.ldap_server+'');
+				
+				var LDAPName = '';
+				var LDAPUuid = '';
+// 				var ldap_rdn = ldapGR.rdn+'';
+// 				ldap_rdn = ldap_rdn.replace(/DC=/g,"").replace(/,/g,".");
+				var dir_body = { 
+					"kind": "directory_service", 
+					"filter": 'url=='+ldapGR.server_url //+";domain_name=="+ldap_rdn
+					} 
+				this.logger.debug("Body for directory services:: :: "+JSON.stringify(dir_body)); 
+			
+				var response = this.appUtil.makeCalmApiCall("POST", this.appUtil.configuration.api.directoryServices+"", JSON.stringify(dir_body));
+				this.logger.debug("Response Body for directory :: "+response.getBody());
+				
+				if(response.getStatusCode() == '200' || response.getStatusCode() == '201'){
+
+					var parsed = JSON.parse(response.getBody());
+					parsed = parsed.entities;
+					for(var p in parsed){
+						var par_entity = parsed[p];
+						var domain_name = par_entity.status.resources.domain_name+"";
+//						if(domain_name == ldap_rdn){
+						if(par_entity.status.resources.url+'' == ldapGR.server_url+'' || par_entity.status.resources.url+'' == ldapGR.server_url+'/' || par_entity.status.resources.url+'/' == ldapGR.server_url+'' ){
+							LDAPName = par_entity.status.name+'';
+							LDAPUuid = par_entity.metadata.uuid+'';
+							//gs.error("LDAPName ::"+LDAPName+" LDAPUuid ::"+LDAPUuid);
+							break;
+						}
+					}
+					
+					//LDAPName = parsed.entities[0].status.name+'';
+					//LDAPUuid = parsed.entities[0].metadata.uuid+'';
+					
+				}else{
+					this.logger.error("Nutanix_ConfigureSettingScripts._checkUsersUUID :- Error while updating directory:- "+response.haveError()+" Status code :- "+response.getStatusCode()+" Error :: "+response.getBody());
+				}
+				
+				var body = {
+					"spec": {
+						"resources": {
+							"directory_service_user": {
+								"user_principal_name": userGr.email+'',
+								"directory_service_reference": {
+									"kind": "directory_service",
+									"name": LDAPName,
+									"uuid": LDAPUuid
+								}
+							}
+						}
+					},
+					"metadata": {
+						"kind": "user",
+						"name": userGr.name+''
+					}
+				};
+				this.logger.debug("Body send for user :: "+JSON.stringify(body));
+				var response = this.appUtil.makeCalmApiCall("POST", "/users", JSON.stringify(body));	
+				var res = JSON.parse(response.getBody());
+				if(response.getStatusCode() == '200' || response.getStatusCode() == '201' || response.getStatusCode() == '202'){
+					
+					userGr.x_nuta2_nutanix_ca_nutanix_uuid = JSON.parse(response.getBody()).metadata.uuid+'';
+					userGr.update();
+					
+				}else if(response.getStatusCode() == '400' && res.message_list[0].reason == "DUPLICATE_ENTITY"){
+					
+					var payload = { "kind": "user",
+									"filter" : "username=="+userGr.email+''
+								  };
+					//gs.error("inside duplicacy :: "+JSON.stringify(payload));
+					///
+					
+					var response = this.appUtil.makeCalmApiCall("POST", this.appUtil.configuration.api.getUsersList+"", this.appUtil.stringify(payload));
+					
+					if(response.getStatusCode() == '200' || response.getStatusCode() == '201'){
+						
+						var parsedJSON = this.appUtil.parse(response.getBody());
+						var entities = parsedJSON.entities;
+						var entity = entities[0];
+						var uuid = entity.metadata.uuid+'';
+						userGr.x_nuta2_nutanix_ca_nutanix_uuid = uuid;
+						userGr.update();
+					
+					} else {
+						
+						this.logger.debug("Nutanix_ImportUsers.importUsers:- Connection users/list not established :- "+response.haveError()+" Status code :- "+response.getStatusCode());
+					}
+					///
+					
+				}else{
+					this.logger.error("Nutanix_ConfigureSettingScripts._checkUsersUUID :- Error while creating user entity in calm:- "+response.haveError()+" Status code :- "+response.getStatusCode()+" Error :: "+response.getBody());
+				}
+			}
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._checkUsersUUID. Error:- "+e);
+		}
+	},
+	
+	_updateSnowRole : function(current){
+		
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._updateSnowRole.");		
+			var users = (current.variables.assign_users+'').split(',');
+			for(var i in users){
+				var gr = new GlideRecord("sys_user");
+				gr.addQuery('sys_id',users[i]+'');
+				gr.query();
+				if (gr.next()){
+					r=['3376fd254f452b001200e5201310c717','282bf1fac6112285017366cb5f867469'];
+					for(var i=0;i<r.length;i++){
+ 						var grd = new GlideRecord('sys_user_has_role');
+						grd.addQuery('user',gr.sys_id);
+						grd.addQuery('role',r[i]);
+						grd.query();
+
+						if(!grd.hasNext()){
+						grd.user = gr.sys_id;
+						grd.role = r[i];
+						grd.insert();
+						}
+					}
+				}
+			}
+			var catSysId = current.variables.cat_item+'';
+			var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+			gr.addQuery('catalog_item', catSysId);
+			gr.query();
+			var catName ="";
+			if(gr.next())
+				catName = gr.catalog_item.name+'';
+			
+			this.logger.info("Required plugin roles given to all the assigned users for catalog item::"+catName);
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._updateSnowRole. Error:- "+e);
+		}
+		
+	},
+	
+	_updateUserOverCalm: function(current){
+		try{		
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._updateUserOverCalm.");			
+			
+			if(!current.variables.assign_users)
+				return;
+			
+			this._checkUsersUUID(current);//this create ldap user in calm and updates ldap user uuid in SNOW if user uuid is not present in calm.
+			
+			var response = this.appUtil.makeCalmApiCall("GET", this.appUtil.configuration.api.projectInternal+"/"+current.variables.project, '');
+			
+			if(response.getStatusCode() == '200' || response.getStatusCode() == '201'){
+				var parsed = this.appUtil.parse(response.getBody());
+				var acpRoles = parsed.spec.access_control_policy_list;
+				
+				var acpConsumerRoleIndex = '';
+				
+				for(var i in acpRoles){
+					if(acpRoles[i].acp.resources.role_reference.uuid+'' == gs.getProperty('x_nuta2_nutanix_ca.cosumer.role.uuid')+''){
+						acpConsumerRoleIndex = i;
+					}
+					parsed.spec.access_control_policy_list[i].operation = "UPDATE";
+				}
+				
+				var userGr = new GlideRecord('sys_user');
+				userGr.addEncodedQuery('sys_idIN'+current.variables.assign_users);				
+				userGr.query();
+				
+				var userArr = {};
+				
+				while(userGr.next()){
+					userArr[userGr.sys_id+''] = {
+						"uuid": (userGr)?userGr.x_nuta2_nutanix_ca_nutanix_uuid+'':'',
+						"email" : (userGr)?userGr.email+'':''
+					};
+				}
+				
+				if(acpConsumerRoleIndex){//if consumer role is there in project
+					
+					var users = (current.variables.assign_users+'').split(',');
+					for(var i in users){
+						parsed.spec.access_control_policy_list[acpConsumerRoleIndex].acp.resources.user_reference_list.push({
+							"name": (userArr[users[i]+''])?userArr[users[i]+''].email+'':'',
+							"kind": "user",
+							"uuid": (userArr[users[i]+''])?userArr[users[i]+''].uuid+'':''
+						});
+						
+						parsed.spec.project_detail.resources.user_reference_list.push({
+							"name": (userArr[users[i]+''])?userArr[users[i]+''].email+'':'',
+							"kind": "user",
+							"uuid": (userArr[users[i]+''])?userArr[users[i]+''].uuid+'':''
+						});
+					}
+					
+				}else{ //pushes consumer role in project
+					
+					var tmp = {"acp":{"name":"nuCalmAcp-5c6f46ae-7c3c-3b65-875c-854a8454fd43","resources":{"role_reference":{"name":"Consumer","uuid":"49e8f061-0948-4705-953b-88915397bd60","kind":"role"},"user_group_reference_list":[],"user_reference_list":[{"name":"testldapuser1@calsoftcalm.com","kind":"user","uuid":"fd30a31e-de7a-5a0b-bef8-d0fb904f871d"},{"name":"testldapuser2@calsoftcalm.com","kind":"user","uuid":"b80ed282-bfa9-55c8-9bfc-82671ccd8721"}],"filter_list":{"context_list":[{"scope_filter_expression_list":[{"operator":"IN","left_hand_side":"PROJECT","right_hand_side":{"uuid_list":["b5427cbd-3c18-4c4d-a170-9abd565bc8ac"]}}],"entity_filter_expression_list":[{"operator":"IN","left_hand_side":{"entity_type":"ALL"},"right_hand_side":{"collection":"ALL"}}]},{"entity_filter_expression_list":[{"operator":"IN","left_hand_side":{"entity_type":"image"},"right_hand_side":{"collection":"ALL"}},{"operator":"IN","left_hand_side":{"entity_type":"marketplace_item"},"right_hand_side":{"collection":"SELF_OWNED"}}]}]}},"description":"untitledAcp-e3c568f8-e11b-71e3-a916-493940647e79"},"metadata":{"kind":"access_control_policy"},"operation":"ADD"};
+					
+					tmp.acp.resources.role_reference = {
+						"name": "Consumer",
+						"uuid": gs.getProperty('x_nuta2_nutanix_ca.cosumer.role.uuid')+'',
+						"kind": "role"
+					};
+					
+					tmp.acp.resources.user_reference_list = [];
+					
+					var users = (current.variables.assign_users+'').split(',');
+					for(var i in users){
+
+						tmp.acp.resources.user_reference_list.push({
+							"name": (userArr[users[i]+''])?userArr[users[i]+''].email+'':'',
+							"kind": "user",
+							"uuid": (userArr[users[i]+''])?userArr[users[i]+''].uuid+'':''
+						});
+						
+						parsed.spec.project_detail.resources.user_reference_list.push({
+							"name": (userArr[users[i]+''])?userArr[users[i]+''].email+'':'',
+							"kind": "user",
+							"uuid": (userArr[users[i]+''])?userArr[users[i]+''].uuid+'':''
+						});
+					}
+					parsed.spec.access_control_policy_list.push(tmp);
+					
+				}
+				
+				var requestBody = {
+					"spec": parsed.spec,
+					"api_version": parsed.api_version,
+					"metadata": parsed.metadata
+				}
+				
+				var response = this.appUtil.makeCalmApiCall("PUT", this.appUtil.configuration.api.projectInternal+"/"+current.variables.project, JSON.stringify(requestBody));
+				
+// 				gs.error("Request:- "+JSON.stringify(requestBody));
+// 				gs.error("Response:- "+JSON.stringify(response.getBody()));
+// 				gs.error("Response2:- "+JSON.stringify(response.getErrorMessage()));
+				
+				if(response.getStatusCode() == '200' || response.getStatusCode() == '201' || response.getStatusCode() == '202'){
+					this.logger.info("Nutanix_ConfigureSettingScripts._updateUserOverCalm:- Users successfuly updated in calm.");
+					this._updateSnowRole(current);
+				}else{
+					this.logger.error("Nutanix_ConfigureSettingScripts._updateUserOverCalm :- Error while updating users onto calm :- "+response.haveError()+" Status code :- "+response.getStatusCode()+" Error :: "+response.getBody());
+				}
+			}else{
+				this.logger.error("Nutanix_ConfigureSettingScripts._updateUserOverCalm :- Connection to /projects_internal not established :- "+response.haveError()+" Status code :- "+response.getStatusCode());
+			}
+			
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._updateUserOverCalm. Error:- "+e);
+		}
+	},
+	
+	///changes
+	_checkGroupUUID: function(current){
+		try{		
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._checkGroupsUUID.");
+			var groupGr = new GlideRecord('sys_user_group');
+			//gs.error("current group::"+current.variables.assign_groups);
+			groupGr.addEncodedQuery('sys_idIN'+current.variables.assign_groups+'^x_nuta2_nutanix_ca_nutanix_group_uuidISEMPTY');				
+			groupGr.query();
+			
+			while(groupGr.next()){
+				//gs.error("Groups :: "+current.variables.assign_groups.getDisplayValue()+''+" Group name :: "+groupGr.name);
+				var groups = (current.variables.assign_groups.getDisplayValue()+'').split(',');
+				
+				//for(var i in groups){
+				//	gs.error("Specific Group user  :: "+groups[i]);
+					var distinguishedName = groupGr.source.replace(/ldap:/g,""); //"CN="+groups[i]+",CN=Users,DC=calsoftcalm,DC=com";
+// 					var encodedName = encodeURIComponent(distinguishedName.toLowerCase());
+// 					var body = {
+// 						"entity_type":"user_group",
+// 						"group_member_attributes":[{"attribute":"uuid"},{"attribute":"distinguished_name"}],
+// 						"query_name":"prism:BaseGroupModel",
+// 						"filter_criteria":"distinguished_name== "+encodedName
+// 					};
+
+// 					this.logger.debug("Body send for check of group :: "+JSON.stringify(body));
+// 					var response = this.appUtil.makeCalmApiCall("POST", "/groups", JSON.stringify(body));	
+// 					var respBody = JSON.parse(response.getBody());
+// 					gs.error("/group call :: "+response.getBody());
+// 					if(response.getStatusCode() == '200' || response.getStatusCode() == '201' || response.getStatusCode() == '202'){
+// 						if(respBody.filtered_group_count == 1)
+// 						{
+// 						groupGr.x_nuta2_nutanix_ca_nutanix_group_uuid = respBody.group_results[0].entity_results[0].entity_id+'';
+// 						gs.info("Group exist working");
+// 						groupGr.update();
+// 						} 
+						//else {
+						//	this.logger.error("Nutanix_ConfigureSettingScripts._checkGroupsUUID :- filter group count is not 1:- "+response.haveError()+" Status code :- "+response.getStatusCode()+" Error :: "+response.getBody());
+							var body = {
+							"api_version": "3.0",
+							"metadata": {
+								"kind": "user_group"
+							},
+							"spec": {
+								"resources": {
+									"directory_service_user_group": {
+										"distinguished_name": distinguishedName
+									}
+								}
+							}
+							};
+							this.logger.debug("Body send for group :: "+JSON.stringify(body));
+							var response = this.appUtil.makeCalmApiCall("POST", "/user_groups", JSON.stringify(body));	
+							var res = JSON.parse(response.getBody());
+							if(response.getStatusCode() == '200' || response.getStatusCode() == '201' || response.getStatusCode() == '202'){
+								
+								//gs.error("Body recieved for group :: "+response.getBody());
+								groupGr.x_nuta2_nutanix_ca_nutanix_group_uuid = JSON.parse(response.getBody()).metadata.uuid+'';
+								groupGr.update();
+								
+							}else if(response.getStatusCode() == '400' && res.message_list[0].reason == "DUPLICATE_ENTITY"){
+								
+								var payload =  {	"kind": "user_group",
+													"filter" : "group_name=="+groupGr.name+''
+												};
+								//gs.error("inside duplicacy :: "+JSON.stringify(payload));
+								//this.appUtil.insertIntoQueue("importGroups", "POST", this.appUtil.stringify(payload), this.appUtil.configuration.api.getGroupsList+"", 'Import groups', 'This job invokes the import of groups from LDAP.');
+								///
+								
+								var response = this.appUtil.makeCalmApiCall("POST", this.appUtil.configuration.api.getGroupsList+"", this.appUtil.stringify(payload));
+								
+								if(response.getStatusCode() == '200' || response.getStatusCode() == '201'){
+								
+									var parsedJSON = this.appUtil.parse(response.getBody());
+									var entities = parsedJSON.entities;
+									var entity = entities[0];
+									var uuid = entity.metadata.uuid+'';
+									groupGr.x_nuta2_nutanix_ca_nutanix_group_uuid = uuid;
+									groupGr.update();
+									
+								} else {
+									
+									this.logger.debug("Nutanix_ImportUsers.importUsers:- Connection users/list not established :- "+response.haveError()+" Status code :- "+response.getStatusCode());
+								}
+								///
+							}else{
+								this.logger.error("Nutanix_ConfigureSettingScripts._checkGroupsUUID :- Error while creating group entity in calm:- "+response.haveError()+" Status code :- "+response.getStatusCode()+" Error :: "+response.getBody());
+							}
+						//}
+					//} 
+
+				//} 
+			}
+		} catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._checkGroupUUID. Error:- "+e);
+		}
+	},
+	
+	_updateGroupSnowRole : function(current){
+		
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._updateGroupSnowRole.");		
+			var groups = (current.variables.assign_groups+'').split(',');
+			for(var i in groups){
+				var gr = new GlideRecord("sys_user_group");
+				gr.addQuery('sys_id',groups[i]+'');
+				gr.query();
+				if (gr.next()){
+					r=['3376fd254f452b001200e5201310c717','282bf1fac6112285017366cb5f867469'];
+					for(var i=0;i<r.length;i++){
+						var grd = new GlideRecord('sys_group_has_role');
+						grd.addQuery('group',gr.sys_id);
+						grd.addQuery('role',r[i]);
+						grd.query();
+
+						if(!grd.hasNext()){
+						grd.group = gr.sys_id;
+						grd.role = r[i];
+						grd.insert();
+						}
+					}
+				}
+			}
+			var catSysId = current.variables.cat_item+'';
+			var gr = new GlideRecord(this.appUtil.configuration.table.variablesProperties+'');
+			gr.addQuery('catalog_item', catSysId);
+			gr.query();
+			var catName ="";
+			if(gr.next())
+				catName = gr.catalog_item.name+'';
+			
+			this.logger.info("Required plugin roles given to all the assigned groups for catalog item::"+catName);
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._updateGroupSnowRole. Error:- "+e);
+		}
+		
+	},
+	
+	_updateGroupOverCalm: function(current){
+		try{		
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._updateGroupOverCalm.");			
+			
+			if(!current.variables.assign_groups)
+				return;
+			
+			this._checkGroupUUID(current);//this create ldap group in calm and updates ldap group uuid in SNOW if group uuid is not present in calm.
+			
+			var response = this.appUtil.makeCalmApiCall("GET", this.appUtil.configuration.api.projectInternal+"/"+current.variables.project, '');
+			
+			if(response.getStatusCode() == '200' || response.getStatusCode() == '201'){
+				var parsed = this.appUtil.parse(response.getBody());
+				var acpRoles = parsed.spec.access_control_policy_list;
+				//gs.error("Project internal parsed :: "+response.getBody());
+				var acpConsumerRoleIndex = '';
+				
+				for(var i in acpRoles){
+					if(acpRoles[i].acp.resources.role_reference.uuid+'' == gs.getProperty('x_nuta2_nutanix_ca.cosumer.role.uuid')+''){
+						acpConsumerRoleIndex = i;
+					}
+					parsed.spec.access_control_policy_list[i].operation = "UPDATE";
+				}
+				
+				var groupGr = new GlideRecord('sys_user_group');
+				groupGr.addEncodedQuery('sys_idIN'+current.variables.assign_groups);				
+				groupGr.query();
+				
+				var groupArr = {};
+				
+				while(groupGr.next()){
+					groupArr[groupGr.sys_id+''] = {
+						"uuid": (groupGr)?groupGr.x_nuta2_nutanix_ca_nutanix_group_uuid+'':'',
+						"name" : (groupGr)?groupGr.name+'':''
+					};
+				}
+				//gs.error("Group created :: "+JSON.stringify(groupArr));
+				if(acpConsumerRoleIndex){//if consumer role is there in project
+					
+					var groups = (current.variables.assign_groups+'').split(',');
+					for(var i in groups){
+						parsed.spec.access_control_policy_list[acpConsumerRoleIndex].acp.resources.user_group_reference_list.push({
+							"name": (groupArr[groups[i]+''])?groupArr[groups[i]+''].name+'':'',
+							"kind": "user_group",
+							"uuid": (groupArr[groups[i]+''])?groupArr[groups[i]+''].uuid+'':''
+						});
+						
+						parsed.spec.project_detail.resources.external_user_group_reference_list.push({
+							"name": (groupArr[groups[i]+''])?groupArr[groups[i]+''].name+'':'',
+							"kind": "user_group",
+							"uuid": (groupArr[groups[i]+''])?groupArr[groups[i]+''].uuid+'':''
+						});
+					}
+					//gs.error("Parsed if acpConsumerRoleIndex :: "+JSON.stringify(parsed));
+					
+				}else{ //pushes consumer role in project
+					
+					var tmp = {"acp":{"name":"nuCalmAcp-5c6f46ae-7c3c-3b65-875c-854a8454fd43","resources":{"role_reference":{"name":"Consumer","uuid":"49e8f061-0948-4705-953b-88915397bd60","kind":"role"},"user_group_reference_list":[],"user_reference_list":[{"name":"testldapuser1@calsoftcalm.com","kind":"user","uuid":"fd30a31e-de7a-5a0b-bef8-d0fb904f871d"},{"name":"testldapuser2@calsoftcalm.com","kind":"user","uuid":"b80ed282-bfa9-55c8-9bfc-82671ccd8721"}],"filter_list":{"context_list":[{"scope_filter_expression_list":[{"operator":"IN","left_hand_side":"PROJECT","right_hand_side":{"uuid_list":["b5427cbd-3c18-4c4d-a170-9abd565bc8ac"]}}],"entity_filter_expression_list":[{"operator":"IN","left_hand_side":{"entity_type":"ALL"},"right_hand_side":{"collection":"ALL"}}]},{"entity_filter_expression_list":[{"operator":"IN","left_hand_side":{"entity_type":"image"},"right_hand_side":{"collection":"ALL"}},{"operator":"IN","left_hand_side":{"entity_type":"marketplace_item"},"right_hand_side":{"collection":"SELF_OWNED"}}]}]}},"description":"untitledAcp-e3c568f8-e11b-71e3-a916-493940647e79"},"metadata":{"kind":"access_control_policy"},"operation":"ADD"};
+					
+					tmp.acp.resources.role_reference = {
+						"name": "Consumer",
+						"uuid": gs.getProperty('x_nuta2_nutanix_ca.cosumer.role.uuid')+'',
+						"kind": "role"
+					};
+					
+					tmp.acp.resources.external_user_group_reference_list = [];
+					
+					var groups = (current.variables.assign_groups+'').split(',');
+					for(var i in groups){
+
+						tmp.acp.resources.user_group_reference_list.push({
+							"name": (groupArr[groups[i]+''])?groupArr[groups[i]+''].name+'':'',
+							"kind": "user_group",
+							"uuid": (groupArr[groups[i]+''])?groupArr[groups[i]+''].uuid+'':''
+						});
+						
+						parsed.spec.project_detail.resources.external_user_group_reference_list.push({
+							"name": (groupArr[groups[i]+''])?groupArr[groups[i]+''].name+'':'',
+							"kind": "user_group",
+							"uuid": (groupArr[groups[i]+''])?groupArr[groups[i]+''].uuid+'':''
+						});
+					}
+					parsed.spec.access_control_policy_list.push(tmp);
+					//gs.error("Parsed without acpConsumerRoleIndex :: "+JSON.stringify(parsed));
+				}
+				
+				var requestBody = {
+					"spec": parsed.spec,
+					"api_version": parsed.api_version,
+					"metadata": parsed.metadata
+				}
+				
+				var response = this.appUtil.makeCalmApiCall("PUT", this.appUtil.configuration.api.projectInternal+"/"+current.variables.project, JSON.stringify(requestBody));
+				
+// 				gs.error("Request:- "+JSON.stringify(requestBody));
+// 				gs.error("Response:- "+JSON.stringify(response.getBody()));
+// 				gs.error("Response2:- "+JSON.stringify(response.getErrorMessage()));
+				
+				if(response.getStatusCode() == '200' || response.getStatusCode() == '201' || response.getStatusCode() == '202'){
+					this.logger.info("Nutanix_ConfigureSettingScripts._updateGroupOverCalm:- Groups successfuly updated in calm.");
+					this._updateGroupSnowRole(current);
+				}else{
+					this.logger.error("Nutanix_ConfigureSettingScripts._updateGroupOverCalm :- Error while updating groups onto calm :- "+response.haveError()+" Status code :- "+response.getStatusCode()+" Error :: "+response.getBody());
+				}
+			}else{
+				this.logger.error("Nutanix_ConfigureSettingScripts._updateGroupOverCalm :- Connection to /projects_internal not established :- "+response.haveError()+" Status code :- "+response.getStatusCode());
+			}
+			
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._updateGroupOverCalm. Error:- "+e);
+		}
+	},
+	////changes over
+	
+	_updateCatalogItem: function(source, target, bpSys_id, current){
+		
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._updateCatalogItem.");			
+			var catItemSysId = current.variables.cat_item+'';
+
+			var ans = [];
+
+			var assignCriteria = new GlideRecord(this.appUtil.configuration.table.catalogUserCriteria+'');
+			assignCriteria.addQuery('sc_cat_item', catItemSysId);
+			assignCriteria.query();
+
+			this.logger.info("Updated user & group entitlement to "+current.variables.assign_users+" :: "+current.variables.assign_groups);		
+			
+			if(assignCriteria.next()){
+				var user_criteria = assignCriteria.user_criteria.getRefRecord();
+
+				user_criteria.user = current.variables.assign_users;
+				user_criteria.group = current.variables.assign_groups;
+				var criteriaSysId = user_criteria.update();
+
+				ans.push(catItemSysId);
+				ans.push(criteriaSysId);
+			}		
+
+			return ans;
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._updateCatalogItem. Error:- "+e);
+		}
+	},
+	
+	_copyCatalogItem: function(source, target, bpSys_id, current, blueprintType){
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._copyCatalogItem.");			
+
+			var sourceGR = new GlideRecord(source);
+			sourceGR.addQuery('sys_id', bpSys_id);
+			sourceGR.query();
+
+			var ans = [];
+
+			if(sourceGR.next()){
+
+				var profileSysID = '';
+				var appSysID = '';
+				var targetGr = sourceGR;
+
+				targetGr.sys_name = current.variables.item_name+'';
+				targetGr.name = current.variables.item_name+'';
+				targetGr.short_description = current.variables.item_name+'';
+				targetGr.description = current.variables.description+'';
+				targetGr.active = true;
+				targetGr.blueprint_name = bpSys_id+'';
+				targetGr.sys_class_name = target+'';
+				if(blueprintType == "published"){
+					
+					targetGr.cloned_bp_json = gs.getSession().getClientData('non_filtered_cloned_bp_response')+'';
+					targetGr.cloned_bp_uuid = (JSON.parse(gs.getSession().getClientData('Cloned_bp_response')).uuid+'') ? JSON.parse(gs.getSession().getClientData('Cloned_bp_response')).uuid+'' : "";
+					targetGr.cloned_bp_name = (JSON.parse(gs.getSession().getClientData('Cloned_bp_response')).name+'') ? JSON.parse(gs.getSession().getClientData('Cloned_bp_response')).name+'' : "";
+					
+				}
+				
+				var catItemSysId = targetGr.insert();
+				
+				var imageBase64Str = gs.getProperty('x_nuta2_nutanix_ca.default.image');
+				
+				var gr = new GlideRecord('sys_attachment');
+				gr.addQuery('table_sys_id', catItemSysId);	//tablesys_id of the record
+				gr.query();
+				if(gr.next()){
+					var kk = new GlideSysAttachment();
+					imageBase64Str = kk.getContentBase64(gr);	
+				}
+				
+				var attachGR = new GlideSysAttachment();
+				attachGR.writeBase64(targetGr, 'picture', 'image/png', imageBase64Str);
+				
+				attachGR = new GlideSysAttachment();
+				attachGR.writeBase64(targetGr, 'icon', 'image/png', gs.getProperty('x_nuta2_nutanix_ca.default.icons'));
+
+				
+				
+				
+				this.logger.debug("Created catalog item with sysId "+catItemSysId);			
+				this.logger.info("Catalog item "+current.variables.item_name+" creating.");			
+				
+				var fieldGR = new GlideRecord(this.appUtil.configuration.table.varaiblesTable+'');
+				fieldGR.addEncodedQuery('cat_item='+bpSys_id);
+				fieldGR.query();
+
+				while(fieldGR.next()){
+					var newField = fieldGR;
+
+					newField.cat_item = catItemSysId+'';
+					var fieldSysId = newField.insert();
+
+					if(fieldGR.name+'' == 'default_profile')
+						profileSysID = fieldSysId;
+					
+					if(fieldGR.name+'' == 'default_app_name')
+						appSysID = fieldSysId;
+				}
+
+				this.logger.debug("Created variables for catalog item "+current.variables.item_name);	
+				
+				/*var insVar = new GlideRecord(this.appUtil.configuration.table.varaiblesTable+''); //Inserts variable to check sync or delete
+				insVar.addQuery('cat_item', catItemSysId);
+				insVar.query();
+				if(insVar.next()) {
+					insVar.initialize();
+					insVar.type = 6;
+					insVar.cat_item = catItemSysId+'';
+					insVar.active = true;
+					insVar.question_text = 'sync_flag';
+					insVar.name = 'sync_flag';
+					insVar.mandatory = 'false';
+					insVar.order = 0;
+					insVar.insert();
+				}*/
+				
+				//Hide containers on order page
+				var hideGR = new GlideRecord(this.appUtil.configuration.table.varaiblesTable+'');
+				hideGR.addQuery('cat_item', catItemSysId);
+				hideGR.addQuery('active', true);
+				hideGR.orderBy('order');
+				var previousGR = new GlideRecord(this.appUtil.configuration.table.varaiblesTable+'');
+				previousGR.addQuery('cat_item', catItemSysId);
+				previousGR.addQuery('active', true);
+				previousGR.orderBy('order');
+				hideGR.query();
+				previousGR.query();
+				while(hideGR.next()) {
+					if(hideGR.type==20 && previousGR.type==19) {
+						hideGR.active = false;
+						previousGR.active = false;
+						previousGR.update();
+						hideGR.update();
+					}
+					previousGR.next();
+				}
+				
+				var user_criteria = new GlideRecord(this.appUtil.configuration.table.userCriteria+'');
+				user_criteria.initialize();
+				user_criteria.name = "Nutanix_"+current.variables.item_name+"_Entitlement";
+				user_criteria.user = current.variables.assign_users;
+				user_criteria.group = current.variables.assign_groups;
+				user_criteria.role = gs.getProperty('x_nuta2_nutanix_ca.admin.role.sysId');
+				user_criteria.active = true;
+				user_criteria.advanced = true;
+				user_criteria.match_all = false;
+				user_criteria.script = "answer = false;";
+				var criteriaSysId = user_criteria.insert();
+
+				this.logger.debug("Entitled users & groups to catalog item "+current.variables.item_name);	
+				
+				var assignCriteria = new GlideRecord(this.appUtil.configuration.table.catalogUserCriteria+'');
+				assignCriteria.initialize();
+				assignCriteria.sc_cat_item = catItemSysId+'';
+				assignCriteria.user_criteria = criteriaSysId+'';
+				assignCriteria.insert();
+
+				ans.push(catItemSysId);
+				ans.push(criteriaSysId);
+				
+				/*var onLoadclientScript = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				onLoadclientScript.initialize();
+				onLoadclientScript.name = "Get sync status on load";
+				onLoadclientScript.type = "onLoad";
+				onLoadclientScript.applies_to = "item";
+				onLoadclientScript.cat_item = catItemSysId;
+				onLoadclientScript.active = true;
+				onLoadclientScript.order=100;
+				//onLoadclientScript.sys_policy=protected;
+
+				onLoadclientScript.description = 'This script is auto created thorugh runtime module for saving sync status.';
+
+				onLoadclientScript.applies_catalog = true;
+				onLoadclientScript.ui_type = "0";
+				onLoadclientScript.applies_req_item = false;
+				onLoadclientScript.applies_sc_task = false;
+				onLoadclientScript.script = "function onLoad() { g_form.setValue('sync_flag', ''); var a=new GlideAjax('Nutanix_ClientServerScriptBridge');a.addParam('sysparm_name','checkQueue');a.getXML(responseParse);} function responseParse(response) {var b=response.responseXML.documentElement.getAttribute('answer');g_form.setValue('sync_flag', b);}";
+				onLoadclientScript.insert();
+
+				this.logger.debug("Created onLoad get sync value script on catalog item "+current.variables.item_name);
+				
+				var onSubmitclientScript = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				onSubmitclientScript.initialize();
+				onSubmitclientScript.name = "Prevent form submit";
+				onSubmitclientScript.type = "onSubmit";
+				onSubmitclientScript.applies_to = "item";
+				onSubmitclientScript.cat_item = catItemSysId;
+				onSubmitclientScript.active = true;
+				onSubmitclientScript.order=100;
+				//onLoadclientScript.sys_policy=protected;
+
+				onSubmitclientScript.description = 'This script is auto created thorugh runtime module for preventing submission of form during a sync or delete.';
+
+				onSubmitclientScript.applies_catalog = true;
+				onSubmitclientScript.ui_type = "0";
+				onSubmitclientScript.applies_req_item = false;
+				onSubmitclientScript.applies_sc_task = false;
+				onSubmitclientScript.script = "function onSubmit() { var sync_stat = g_form.getValue('sync_flag'); if(sync_stat == 'true'){return true;}else{return false;} }";
+				onSubmitclientScript.insert();
+
+				this.logger.debug("Created onSubmit validation script on catalog item "+current.variables.item_name);*/
+				
+				var onLoadclientScript = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				onLoadclientScript.initialize();
+				onLoadclientScript.name = "Get Project and Profile List onLoad";
+				onLoadclientScript.type = "onLoad";
+				onLoadclientScript.applies_to = "item";
+				onLoadclientScript.cat_item = catItemSysId;
+				onLoadclientScript.active = true;
+				onLoadclientScript.order=100;
+				//onLoadclientScript.sys_policy=protected;
+
+				onLoadclientScript.description = 'This script is auto created thorugh runtime module for getting projects and profile list.';
+
+				onLoadclientScript.applies_catalog = true;
+				onLoadclientScript.ui_type = "0";
+				onLoadclientScript.applies_req_item = false;
+				onLoadclientScript.applies_sc_task = false;
+				onLoadclientScript.script = "function onLoad() { var cat_sys_id = g_form.getUniqueValue();  var ga = new GlideAjax('x_nuta2_nutanix_ca.Nutanix_ClientServerScriptBridge'); ga.addParam('sysparm_name', 'fetchProjectAndProfileList'); ga.addParam('sysparm_catSysID', cat_sys_id); ga.getXML(parseResponse);  function parseResponse(response) { var answer = response.responseXML.documentElement.getAttribute('answer'); 		 var parsed = JSON.parse(answer);  var projectList = parsed.projectList; g_form.clearOptions('default_project'); for(var i = 0; i < projectList.length ; i++){ var project = projectList[i]; g_form.addOption('default_project', project.uuid, project.name); } 		 var profileList = parsed.profileList.split(','); g_form.clearOptions('default_profile'); g_form.setReadOnly('default_project', true); for(i=0; i<profileList.length; i++){ g_form.addOption('default_profile', profileList[i]+'', profileList[i]+''); }  }  }";
+				onLoadclientScript.insert();
+
+				this.logger.debug("Created onLoad script to get project and profile list on catalog item "+current.variables.item_name);
+	
+				var onLoadclientScript = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				onLoadclientScript.initialize();
+				onLoadclientScript.name = "Get Credentials OnLoad";
+				onLoadclientScript.type = "onLoad";
+				onLoadclientScript.applies_to = "item";
+				onLoadclientScript.cat_item = catItemSysId;
+				onLoadclientScript.active = true;
+				onLoadclientScript.order=200;
+
+				onLoadclientScript.description = 'This script is auto created thorugh runtime module for getting Credentials list.';
+
+				onLoadclientScript.applies_catalog = true;
+				onLoadclientScript.ui_type = "0";
+				onLoadclientScript.applies_req_item = false;
+				onLoadclientScript.applies_sc_task = false;
+				onLoadclientScript.script = "function onLoad() { var cat_sys_id = g_form.getUniqueValue(); var ga = new GlideAjax('x_nuta2_nutanix_ca.Nutanix_ClientServerScriptBridge'); ga.addParam('sysparm_name', 'fetchCredentialsList'); ga.addParam('sysparm_catSysID', cat_sys_id); ga.getXML(parseResponse);  function parseResponse(response) { var answer = response.responseXML.documentElement.getAttribute('answer'); var parsed = JSON.parse(answer); for (var i in parsed) { var credential = parsed[i]; var name = (credential.actual_name + '').toLowerCase().replace(/ /g, '_'); g_form.setValue(name + '_credential_name', credential.name + ''); g_form.setReadOnly(name + '_credential_name', true); g_form.setValue(name + '_secret_type', credential.type + '', (credential.type + '' == 'KEY') ? 'SSH Private Key' : 'Password'); g_form.setReadOnly(name + '_secret_type', true); g_form.setValue(name + '_username', credential.username.value); g_form.setReadOnly(name + '_username', credential.username.readOnly); g_form.setDisplay(name + '_username', !credential.username.readOnly); if ((credential.type == 'KEY')) { g_form.setValue(name + '_ssh_private_key', credential.ssh_private_key.value); g_form.setReadOnly(name + '_ssh_private_key', credential.ssh_private_key.readOnly); g_form.setValue(name + '_passphrase', credential.passphrase.value); g_form.setReadOnly(name + '_passphrase', credential.passphrase.readOnly);  g_form.setDisplay(name + '_password', 'false');  g_form.setDisplay(name + '_ssh_private_key', !credential.ssh_private_key.readOnly); g_form.setDisplay(name + '_passphrase', !credential.passphrase.readOnly); } else { g_form.setValue(name + '_password', credential.password.value); g_form.setReadOnly(name + '_password', credential.password.readOnly);  g_form.setDisplay(name + '_password', !credential.password.readOnly);  g_form.setDisplay(name + '_ssh_private_key', 'false'); g_form.setDisplay(name + '_passphrase', 'false'); }             g_form.setDisplay(name + '_credential_reference', 'false'); if (credential.credential_reference && credential.credential_reference.name) { g_form.setDisplay(name + '_credential_reference', 'true'); g_form.addOption(name + '_credential_reference', credential.credential_reference.uuid + '', credential.credential_reference.name + ''); g_form.setReadOnly(name + '_credential_reference', credential.credential_reference.readOnly);  g_form.setDisplay(name + '_credential_reference', !credential.credential_reference.readOnly);   g_form.setDisplay(name + '_ssh_private_key', 'false'); g_form.setDisplay(name + '_passphrase', 'false'); g_form.setDisplay(name + '_password', 'false'); g_form.setDisplay(name + '_secret_type', 'false');   } } } }";
+				onLoadclientScript.insert();
+
+				this.logger.debug("Created onLoad script to get credentials data on catalog item "+current.variables.item_name);	
+
+				var catalogScriptGR = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				catalogScriptGR.initialize();
+				catalogScriptGR.name = "Fetch form data on change of profile";
+				catalogScriptGR.type = "onChange";
+				catalogScriptGR.applies_to = "item";
+				catalogScriptGR.cat_item = catItemSysId;				
+				catalogScriptGR.cat_variable="IO:"+profileSysID;				
+				catalogScriptGR.active = true;
+
+				catalogScriptGR.order=100;
+
+				catalogScriptGR.description = 'This script is auto created thorugh runtime module for fetching and setting form data and visibility.';
+
+				catalogScriptGR.applies_catalog = true;
+				catalogScriptGR.ui_type = "0";
+				catalogScriptGR.applies_req_item = false;
+				catalogScriptGR.applies_sc_task = false;
+				catalogScriptGR.script = "function onChange(control, oldValue, newValue, isLoading) { if (isLoading || newValue == '') { return; } 	 var fldType = {}; var elemen = g_form.elements; for(var i in elemen){ fldType[elemen[i].fieldName+''] = elemen[i].type+''; }  var flds = g_form.nameMap; for(var i in flds){  if(fldType[flds[i].realName+'']+''=='formatter' || fldType[flds[i].realName+'']+''=='container' || fldType[flds[i].realName+'']+''=='checkbox_container' || fldType[flds[i].realName+'']+''=='undefined'){ continue;	 }  g_form.setDisplay(flds[i].prettyName, false); }  g_form.setVariablesReadOnly(true);g_form.setDisplay('provider_icons', 'true'); g_form.setReadOnly('default_project', false); g_form.setReadOnly('default_app_name', false); g_form.setReadOnly('default_profile', false);  g_form.setDisplay('default_project', true); g_form.setDisplay('default_app_name', true); g_form.setDisplay('default_profile', true);  var profile = newValue; var cat_sys_id = g_form.getUniqueValue(); var ga = new GlideAjax('x_nuta2_nutanix_ca.Nutanix_ClientServerScriptBridge'); ga.addParam('sysparm_name', 'fetchOrderFormData'); ga.addParam('sysparm_profile', profile); ga.addParam('sysparm_catSysID', cat_sys_id); ga.getXML(parseResponse);  function parseResponse(response) { var answer = response.responseXML.documentElement.getAttribute('answer');  var parsed = JSON.parse(answer); for (var i in parsed) { g_form.setValue(i + '', parsed[i].value + ''); g_form.setReadOnly(i + '', parsed[i].readOnly + '');  g_form.setDisplay(i + '', !parsed[i].readOnly); } } }";
+				catalogScriptGR.insert();
+
+				this.logger.debug("Created onChange script to get form data on catalog item "+current.variables.item_name);
+
+				
+				catalogScriptGR = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				catalogScriptGR.initialize();
+				catalogScriptGR.name = "Check AppName OnChange";
+				catalogScriptGR.type = "onChange";
+				catalogScriptGR.applies_to = "item";
+				catalogScriptGR.cat_item = catItemSysId;				
+				catalogScriptGR.cat_variable="IO:"+appSysID;				
+				catalogScriptGR.active = true;
+
+				catalogScriptGR.order=100;
+
+				catalogScriptGR.description = 'This script is auto created thorugh runtime module for checking application name.';
+
+				catalogScriptGR.applies_catalog = true;
+				catalogScriptGR.ui_type = "0";
+				catalogScriptGR.applies_req_item = false;
+				catalogScriptGR.applies_sc_task = false;
+				catalogScriptGR.script = "function onChange(control, oldValue, newValue, isLoading) { if (isLoading || newValue == '') { return; } var name = newValue; g_form.clearMessages(); g_form.hideAllFieldMsgs(); if (!(/^[_-\\w ]+$/.test(name) && (name.trim().lastIndexOf('-') != (name.trim().length - 1)))) { g_form.showErrorBox('default_app_name', 'Only alphanumeric characters, underscores(_), hyphens(-) and spaces are allowed and cannot end with hyphens(-).'); } }";
+				catalogScriptGR.insert();
+
+				this.logger.debug("Created onChange script to check application name on "+current.variables.item_name);
+								
+				catalogScriptGR = new GlideRecord(this.appUtil.configuration.table.catalogClientScript+'');
+				catalogScriptGR.initialize();
+				catalogScriptGR.name = "Check AppName OnSubmit";
+				catalogScriptGR.type = "onSubmit";
+				catalogScriptGR.applies_to = "item";
+				catalogScriptGR.cat_item = catItemSysId;							
+				catalogScriptGR.active = true;
+
+				catalogScriptGR.order=100;
+
+				catalogScriptGR.description = 'This script is auto created thorugh runtime module for checking application name on submit.';
+
+				catalogScriptGR.applies_catalog = true;
+				catalogScriptGR.ui_type = "0";
+				catalogScriptGR.applies_req_item = false;
+				catalogScriptGR.applies_sc_task = false;
+				catalogScriptGR.script = "function onSubmit() { var name = g_form.getValue('default_app_name');  if(!(/^[_-\\w ]+$/.test(name) && (name.trim().lastIndexOf('-') != (name.trim().length - 1)))){ g_form.addErrorMessage('Please correct the errors before submitting the catalog item.'); return false; } }";
+				catalogScriptGR.insert();
+
+				this.logger.debug("Created onSubmit script to check application name on "+current.variables.item_name);
+				
+				var cat_ui_policy = new GlideRecord(this.appUtil.configuration.table.catalogUIPolicy+'');
+				cat_ui_policy.initialize();
+				cat_ui_policy.catalog_item = catItemSysId;
+				cat_ui_policy.short_description = 'Make Variables RITM ReadOnly';
+				cat_ui_policy.applies_catalog = false;
+				cat_ui_policy.applies_sc_task = false;
+				cat_ui_policy.applies_req_item = true;
+				cat_ui_policy.run_scripts = true;
+				cat_ui_policy.script_true = 'function onCondition() { g_form.setVariablesReadOnly(true); }';
+				cat_ui_policy.insert();
+				
+				
+				
+				this.logger.debug("Created ui policy to make field readonly on RITM on catalog item "+current.variables.item_name);	
+
+			}		
+			
+			this.logger.info("New Catalog item "+current.variables.item_name+" creation completed.");			
+			return ans;
+			
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._copyCatalogItem. Error:- "+e);
+		}
+	},
+	
+	_insertIntoRuntimeConfigTable: function(ans, current){
+		try{
+			this.logger.debug("Inside Nutanix_ConfigureSettingScripts._insertIntoRuntimeConfigTable.");			
+
+			var createCatalog = current.variables.create_catalog+'';
+
+			if(createCatalog == 'yes'){
+
+				var project = new GlideRecord(this.appUtil.configuration.table.Project+'');
+				project.addQuery('uuid', current.variables.project+'');
+				project.setLimit(1);
+				project.query();
+				project.next();
+
+				var gr = new GlideRecord(this.appUtil.configuration.table.runtimeConfig+'');
+				gr.initialize();
+				gr.application_profile = current.variables.application_profile+'';
+				//gr.assigned_users = current.variables.assign_users+'';
+				gr.user_criteria = ans[1];
+				gr.blueprint = current.variables.blueprint+'';
+				//gr.description = current.variables.description+'';
+				gr.item_name = ans[0]+'';
+				gr.project = project.sys_id+'';
+				gr.insert();
+		
+				this.logger.info("Inserting value and runtime value of fields into variable proerpteis table.");			
+			}else{
+				var gr = new GlideRecord(this.appUtil.configuration.table.runtimeConfig+'');
+				gr.addQuery('item_name', current.variables.cat_item+'');
+				gr.query();
+				if(gr.next()){
+					gr.application_profile = gr.application_profile + ',' + current.variables.application_profile+'';
+					gr.update();
+				}
+				
+				this.logger.info("Updating value and runtime value of fields into variable proerpteis table.");			
+			}
+			
+		}catch(e){
+			this.logger.error("Exception caught inside Nutanix_ConfigureSettingScripts._insertIntoRuntimeConfigTable. Error:- "+e);
+		}
+		
+	},
+	
+    type: 'Nutanix_ConfigureSettingScripts'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>girishgyani</sys_created_by>
+        <sys_created_on>2018-11-13 16:38:54</sys_created_on>
+        <sys_id>75c3833837fd2300fdfc097973990e2f</sys_id>
+        <sys_mod_count>203</sys_mod_count>
+        <sys_name>Nutanix_ConfigureSettingScripts</sys_name>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_script_include_75c3833837fd2300fdfc097973990e2f</sys_update_name>
+        <sys_updated_by>girishgyani</sys_updated_by>
+        <sys_updated_on>2019-06-10 14:43:52</sys_updated_on>
+    </sys_script_include>
+</record_update>

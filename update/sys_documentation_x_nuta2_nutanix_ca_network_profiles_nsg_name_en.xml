@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="nsg_name" label="Security Group" language="en" table="x_nuta2_nutanix_ca_network_profiles">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>nsg_name</element>
+            <help/>
+            <hint/>
+            <label>Security Group</label>
+            <language>en</language>
+            <name>x_nuta2_nutanix_ca_network_profiles</name>
+            <plural>Security Groups</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-27 18:05:45</sys_created_on>
+            <sys_id>011e3903dba2630075f47dda8c961991</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Security Group</sys_name>
+            <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+            <sys_update_name>sys_documentation_x_nuta2_nutanix_ca_network_profiles_nsg_name_en</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-27 18:05:45</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

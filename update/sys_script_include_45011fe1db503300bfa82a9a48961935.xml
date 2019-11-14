@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_nuta2_nutanix_ca.Delete_Inventory</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Delete_Inventory</name>
+        <script><![CDATA[var Delete_Inventory = Class.create();
+Delete_Inventory.prototype = {
+	initialize: function() {
+		this.logger = new Nutanix_Calm_Logger();
+		this.utils = new Nutanix_Calm_Utils();
+	},
+	
+	deleteInventory: function() {
+		
+		this.manageIncidents();
+		
+		var gr = new GlideRecord('sys_db_object');
+		gr.addEncodedQuery('sys_scope=3b7631654f452b001200e5201310c76b^label!=Plugin Configuration');
+		gr.query();
+		
+		while(gr.next()){
+			this.logger.info("Cleaning table: " + gr.name);
+			
+			var k = new GlideRecord(gr.name+'');
+			k.deleteMultiple();
+		}
+		
+		var grGroup=new GlideRecord('sys_user_group');
+		grGroup.addEncodedQuery('x_nuta2_nutanix_ca_nutanix_group_uuidISNOTEMPTY');
+		grGroup.query();
+		while(grGroup.next()) {
+			grGroup.x_nuta2_nutanix_ca_nutanix_group_uuid = '';
+			grGroup.update();
+		}
+		this.logger.info('User groups Nutanix UUID has been cleaned');
+		
+		var grUser=new GlideRecord('sys_user');
+		grUser.addEncodedQuery('x_nuta2_nutanix_ca_nutanix_uuidISNOTEMPTY');
+		grUser.query();
+		while(grUser.next()) {
+			grUser.x_nuta2_nutanix_ca_nutanix_uuid = '';
+			grUser.update();
+		}
+		this.logger.info('Users Nutanix UUID has been cleaned');
+		
+		var grProp = new GlideRecord('x_nuta2_nutanix_ca_calm_plugin_configuration');
+		grProp.addQuery('sys_id', gs.getProperty('x_nuta2_nutanix_ca.nutanix.application.properties.sys_id'));
+		grProp.query();
+		if(grProp.next()) {
+			grProp.calm_instance = '';
+			grProp.calm_admin_username = '';
+			grProp.calm_admin_password = '';
+			grProp.datadelflag = 'no';
+			grProp.update();
+		}
+		gs.setProperty('x_nuta2_nutanix_ca.check.authentication', 'false');
+		this.utils.showHideSyncUiAction('false');
+		this.logger.info('Application properties page has been cleaned');
+		
+	},
+	
+	manageIncidents: function() {
+		
+		try{
+			this.logger.info("Resolving orphaned incidents.");
+
+			var incGr = new GlideRecord('incident');
+			incGr.addEncodedQuery('x_nuta2_nutanix_ca_catalog_item!=NULL^state=6');   //update
+			incGr.query();
+			
+			while(incGr.next()){
+				
+				incGr.incident_state = 7;
+				incGr.state = 7;
+				incGr.comments = 'Auto closed all the resolved incidents as inventory was cleaned.';
+				incGr.update();	
+			}
+			
+// 			incGr.incident_state = 7;
+// 			incGr.state = 7;
+// 			incGr.comments = 'Auto closed all the resolved incidents as inventory was cleaned.';
+// 			incGr.updateMultiple();	
+			
+
+			var incGr = new GlideRecord('incident');
+			incGr.addEncodedQuery('x_nuta2_nutanix_ca_catalog_item!=NULL^incident_state!=8^incident_state!=7');   //update
+			incGr.query();
+			
+			while(incGr.next()){
+
+				incGr.incident_state = 8;
+				incGr.state = 8;
+				incGr.comments = 'Auto cancelled all the open incidents as inventory was cleaned.';
+				
+				incGr.close_code = 'Closed/Resolved by Caller';
+				incGr.close_notes = 'Auto cancelled all the open incidents as inventory was cleaned.';
+				
+				incGr.update();	
+			}
+			
+// 			incGr.incident_state = 8;
+// 			incGr.state = 8;
+// 			incGr.comments = 'Auto cancelled all the open incidents as inventory was cleaned.';
+// 			incGr.close_code = 'Closed/Resolved by Caller';
+// 			incGr.close_notes = 'Auto cancelled all the open incidents as inventory was cleaned.';
+// 			incGr.updateMultiple();
+			
+		} catch(e) {
+			this.logger.error('Exception caught in updating incidents: '+e);
+		}
+	},
+
+	type: 'Delete_Inventory'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>Bharat</sys_created_by>
+        <sys_created_on>2019-03-20 08:19:39</sys_created_on>
+        <sys_id>45011fe1db503300bfa82a9a48961935</sys_id>
+        <sys_mod_count>32</sys_mod_count>
+        <sys_name>Delete_Inventory</sys_name>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_script_include_45011fe1db503300bfa82a9a48961935</sys_update_name>
+        <sys_updated_by>girish.gyani</sys_updated_by>
+        <sys_updated_on>2019-05-13 10:13:14</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="x_nuta2_nutanix_ca_nutanix_cloud_providers" label="VMware" max_length="40" name="x_nuta2_nutanix_ca_vmware" type="collection">
+        <element label="Account UUID" max_length="40" name="account_uuid" type="string"/>
+        <element label="Cluster" max_length="250" name="cluster" type="string"/>
+        <element label="Datastore" max_length="250" name="datastore" type="string"/>
+        <element label="Host" max_length="250" name="host" type="string"/>
+        <element label="Memory Size" max_length="40" name="memory_size_mib" type="string"/>
+        <element label="Number of Sockets" max_length="40" name="num_sockets" type="string"/>
+        <element label="Number  Of vCPUs" max_length="40" name="num_vcpus_per_socket" type="string"/>
+        <element label="Power State" max_length="40" name="power_state" type="string"/>
+        <element label="Instance Name" max_length="250" name="provider_name" type="string"/>
+        <element label="Provider Type" max_length="250" name="provider_type" type="string"/>
+        <element label="Storage POD" max_length="250" name="storage_pod" type="string"/>
+    </element>
+</database>

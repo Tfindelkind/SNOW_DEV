@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Blank Disks" max_length="40" name="x_nuta2_nutanix_ca_blank_disks" type="collection">
+        <element label="Delete when instance is deleted" max_length="40" name="autodelete" type="string"/>
+        <element label="Disk Type" max_length="250" name="disk_type" type="string"/>
+        <element label="Disk Name" max_length="250" name="name" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Provider" max_length="32" name="provider" reference="x_nuta2_nutanix_ca_nutanix_cloud_providers" type="reference"/>
+        <element label="Size in GB" max_length="250" name="sizegb" type="string"/>
+        <index name="index">
+            <element name="provider"/>
+        </index>
+    </element>
+</database>

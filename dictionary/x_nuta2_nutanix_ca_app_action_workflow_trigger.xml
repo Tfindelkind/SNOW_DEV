@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="App Action Workflow Staging Table" max_length="40" name="x_nuta2_nutanix_ca_app_action_workflow_trigger" type="collection">
+        <element label="ActionSysId" max_length="40" name="actionsysid" type="string"/>
+        <element label="Action JSON" max_length="255" name="action_json" type="string"/>
+        <element label="Action Status" max_length="40" name="action_status" type="string"/>
+        <element label="App UUID" max_length="40" name="app_uuid" type="string"/>
+        <element label="User Name" max_length="40" name="user_name" type="string"/>
+    </element>
+</database>

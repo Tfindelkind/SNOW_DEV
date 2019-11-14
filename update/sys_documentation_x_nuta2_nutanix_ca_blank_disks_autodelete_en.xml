@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="autodelete" label="Delete when instance is deleted" language="en" table="x_nuta2_nutanix_ca_blank_disks">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>autodelete</element>
+            <help/>
+            <hint/>
+            <label>Delete when instance is deleted</label>
+            <language>en</language>
+            <name>x_nuta2_nutanix_ca_blank_disks</name>
+            <plural>Delete when instance is deleted</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-27 09:32:38</sys_created_on>
+            <sys_id>4da8804fdb6e230075f47dda8c96197b</sys_id>
+            <sys_mod_count>1</sys_mod_count>
+            <sys_name>Delete when instance is deleted</sys_name>
+            <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+            <sys_update_name>sys_documentation_x_nuta2_nutanix_ca_blank_disks_autodelete_en</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-27 09:40:44</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Network Profiles" max_length="40" name="x_nuta2_nutanix_ca_network_profiles" type="collection">
+        <element label="DNS Label" max_length="200" name="dns_label" type="string"/>
+        <element label="Allocation Method" max_length="200" name="ip_allocation_method" type="string"/>
+        <element label="Name" max_length="200" name="ip_name" type="string"/>
+        <element label="NIC Name" max_length="200" name="nic_name" type="string"/>
+        <element label="Security Group" max_length="200" name="nsg_name" type="string"/>
+        <element label="Allocation Method" max_length="200" name="private_ip_allocation_method" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Provider" max_length="32" name="provider" reference="x_nuta2_nutanix_ca_nutanix_cloud_providers" type="reference"/>
+        <element label="Subnet" max_length="200" name="subnet_name" type="string"/>
+        <element label="Virtual Network" max_length="200" name="vnet_name" type="string"/>
+        <index name="index">
+            <element name="provider"/>
+        </index>
+    </element>
+</database>

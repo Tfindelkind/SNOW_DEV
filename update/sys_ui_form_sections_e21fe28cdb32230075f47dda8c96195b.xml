@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_form_sections form_id="e21fe28cdb32230075f47dda8c96195b" sys_domain="global" table="x_nuta2_nutanix_ca_nutanix" version="3">
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-31 00:13:51</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>ae1fe28cdb32230075f47dda8c96195b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_nuta2_nutanix_ca_nutanix" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">e21fe28cdb32230075f47dda8c96195b</sys_ui_form>
+            <sys_ui_section caption="NULL" display_value="" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">006e620cdb32230075f47dda8c9619ee</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-31 00:13:51</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-31 00:13:51</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>e21fe28cdb32230075f47dda8c96195d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_nuta2_nutanix_ca_nutanix" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">e21fe28cdb32230075f47dda8c96195b</sys_ui_form>
+            <sys_ui_section caption="VM Configuration" display_value="VM Configuration" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">e61fe28cdb32230075f47dda8c96195c</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-31 00:13:51</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-31 00:15:46</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>ee8fe24cdb32230075f47dda8c96196f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_nuta2_nutanix_ca_nutanix" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">e21fe28cdb32230075f47dda8c96195b</sys_ui_form>
+            <sys_ui_section caption="Connection" display_value="Connection" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">628fe24cdb32230075f47dda8c96196e</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-31 00:15:46</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>3</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-31 00:16:35</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>aabfae8cdb32230075f47dda8c96195d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_nuta2_nutanix_ca_nutanix" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">e21fe28cdb32230075f47dda8c96195b</sys_ui_form>
+            <sys_ui_section caption="Disk List" display_value="Disk List" name="x_nuta2_nutanix_ca_nutanix" sys_domain="global" view="Default view">2abfae8cdb32230075f47dda8c96195b</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-31 00:16:35</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form action="INSERT_OR_UPDATE">
+            <name>x_nuta2_nutanix_ca_nutanix</name>
+            <roles/>
+            <sys_class_name>sys_ui_form</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2018-12-31 00:13:51</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>e21fe28cdb32230075f47dda8c96195b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_nuta2_nutanix_ca_nutanix</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+            <sys_update_name>sys_ui_form_sections_e21fe28cdb32230075f47dda8c96195b</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2018-12-31 00:13:51</sys_updated_on>
+            <sys_user/>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_form>
+    </sys_ui_form_sections>
+</record_update>

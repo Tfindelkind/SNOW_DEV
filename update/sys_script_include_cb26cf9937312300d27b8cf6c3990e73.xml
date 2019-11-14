@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_nuta2_nutanix_ca.Run_App_Actions</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description>Run app actions on click</description>
+        <name>Run_App_Actions</name>
+        <script><![CDATA[var Run_App_Actions = Class.create();
+Run_App_Actions.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+	
+	runAction: function() {
+		try{
+			this.utils = new Nutanix_Calm_Utils();
+			this.logger = new Nutanix_Calm_Logger();
+			
+			this.logger.info("Inside Run_App_Actions().runAction()");
+			
+			var runlogResp = ' ';
+			var actSysid = this.getParameter('sysparm_actionsysid');
+			var modActVars = this.getParameter('sysparm_actionVars');
+			var gr = new GlideRecord(this.utils.configuration.table.ActionWorkflowStaging);
+			gr.initialize();
+			gr.actionsysid = actSysid;
+			gr.action_json = modActVars;
+			gr.insert();
+			
+		} catch(e) {
+			this.logger.error("Application action failed: "+e);
+		}
+	},
+
+	type: 'Run_App_Actions'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>bharat.vajj</sys_created_by>
+        <sys_created_on>2018-11-15 06:19:34</sys_created_on>
+        <sys_id>cb26cf9937312300d27b8cf6c3990e73</sys_id>
+        <sys_mod_count>125</sys_mod_count>
+        <sys_name>Run_App_Actions</sys_name>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy>protected</sys_policy>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_script_include_cb26cf9937312300d27b8cf6c3990e73</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-02-22 05:03:59</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="x_nuta2_nutanix_ca_nutanix_cloud_providers" label="Nutanix's" max_length="40" name="x_nuta2_nutanix_ca_nutanix" type="collection">
+        <element label="Availability Zone Reference" max_length="250" name="availability_zone_reference" type="string"/>
+        <element label="Memory" max_length="40" name="memory_size_mib" type="string"/>
+        <element label="Number Of Sockets" max_length="40" name="num_sockets" type="string"/>
+        <element label="Number  of vCPUs" max_length="40" name="num_vcpus_per_socket" type="string"/>
+        <element label="Power State" max_length="40" name="power_state" type="string"/>
+        <element label="Instance Name" max_length="250" name="provider_name" type="string"/>
+        <element label="Provider Type" max_length="250" name="provider_type" type="string"/>
+        <element label="Security Group List" max_length="500" name="security_group_list" type="string"/>
+        <element label="State" max_length="250" name="specific_provider_state" type="string"/>
+        <element label="Type" max_length="250" name="specific_provider_type" type="string"/>
+    </element>
+</database>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="catalog_script_client">
+    <catalog_script_client action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <applies_catalog>true</applies_catalog>
+        <applies_extended>false</applies_extended>
+        <applies_req_item>false</applies_req_item>
+        <applies_sc_task>false</applies_sc_task>
+        <applies_target_record>false</applies_target_record>
+        <applies_to>item</applies_to>
+        <cat_item display_value="test145">de617f69db090010f6fd14613996198b</cat_item>
+        <cat_variable/>
+        <condition/>
+        <description>This script is auto created thorugh runtime module for getting Credentials list.</description>
+        <field/>
+        <global>true</global>
+        <isolate_script>true</isolate_script>
+        <messages/>
+        <name>Get Credentials OnLoad</name>
+        <order>200</order>
+        <script><![CDATA[function onLoad() { var cat_sys_id = g_form.getUniqueValue(); var ga = new GlideAjax('x_nuta2_nutanix_ca.Nutanix_ClientServerScriptBridge'); ga.addParam('sysparm_name', 'fetchCredentialsList'); ga.addParam('sysparm_catSysID', cat_sys_id); ga.getXML(parseResponse);  function parseResponse(response) { var answer = response.responseXML.documentElement.getAttribute('answer'); var parsed = JSON.parse(answer); for (var i in parsed) { var credential = parsed[i]; var name = (credential.actual_name + '').toLowerCase().replace(/ /g, '_'); g_form.setValue(name + '_credential_name', credential.name + ''); g_form.setReadOnly(name + '_credential_name', true); g_form.setValue(name + '_secret_type', credential.type + '', (credential.type + '' == 'KEY') ? 'SSH Private Key' : 'Password'); g_form.setReadOnly(name + '_secret_type', true); g_form.setValue(name + '_username', credential.username.value); g_form.setReadOnly(name + '_username', credential.username.readOnly); g_form.setDisplay(name + '_username', !credential.username.readOnly); if ((credential.type == 'KEY')) { g_form.setValue(name + '_ssh_private_key', credential.ssh_private_key.value); g_form.setReadOnly(name + '_ssh_private_key', credential.ssh_private_key.readOnly); g_form.setValue(name + '_passphrase', credential.passphrase.value); g_form.setReadOnly(name + '_passphrase', credential.passphrase.readOnly);  g_form.setDisplay(name + '_password', 'false');  g_form.setDisplay(name + '_ssh_private_key', !credential.ssh_private_key.readOnly); g_form.setDisplay(name + '_passphrase', !credential.passphrase.readOnly); } else { g_form.setValue(name + '_password', credential.password.value); g_form.setReadOnly(name + '_password', credential.password.readOnly);  g_form.setDisplay(name + '_password', !credential.password.readOnly);  g_form.setDisplay(name + '_ssh_private_key', 'false'); g_form.setDisplay(name + '_passphrase', 'false'); }             g_form.setDisplay(name + '_credential_reference', 'false'); if (credential.credential_reference && credential.credential_reference.name) { g_form.setDisplay(name + '_credential_reference', 'true'); g_form.addOption(name + '_credential_reference', credential.credential_reference.uuid + '', credential.credential_reference.name + ''); g_form.setReadOnly(name + '_credential_reference', credential.credential_reference.readOnly);  g_form.setDisplay(name + '_credential_reference', !credential.credential_reference.readOnly);   g_form.setDisplay(name + '_ssh_private_key', 'false'); g_form.setDisplay(name + '_passphrase', 'false'); g_form.setDisplay(name + '_password', 'false'); g_form.setDisplay(name + '_secret_type', 'false');   } } } }]]></script>
+        <sys_class_name>catalog_script_client</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-11-11 13:27:00</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>487173a9db090010f6fd1461399619cf</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Get Credentials OnLoad</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>catalog_script_client_487173a9db090010f6fd1461399619cf</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-11-11 13:27:00</sys_updated_on>
+        <table/>
+        <type>onLoad</type>
+        <ui_type>0</ui_type>
+        <variable_set/>
+        <view/>
+    </catalog_script_client>
+</record_update>

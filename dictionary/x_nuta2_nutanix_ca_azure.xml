@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="x_nuta2_nutanix_ca_nutanix_cloud_providers" label="Azure" max_length="40" name="x_nuta2_nutanix_ca_azure" type="collection">
+        <element label="Availability Set" max_length="250" name="availability_set_id" type="string"/>
+        <element label="Disk Caching Type" max_length="250" name="caching_type" type="string"/>
+        <element label="Disk Create Options" max_length="250" name="create_option" type="string"/>
+        <element label="Disk Name" max_length="250" name="disk_name" type="string"/>
+        <element label="Location" max_length="250" name="location" type="string"/>
+        <element label="Offer" max_length="250" name="offer" type="string"/>
+        <element label="Publisher" max_length="250" name="publisher" type="string"/>
+        <element label="Resource Group" max_length="250" name="resource_group" type="string"/>
+        <element label="SKU" max_length="250" name="sku" type="string"/>
+        <element label="Custom Image" max_length="200" name="source_image_id" type="string"/>
+        <element label="Disk Storage" max_length="250" name="storage_name" type="string"/>
+        <element label="Storage Type" max_length="250" name="storage_type" type="string"/>
+        <element label="Version" max_length="40" name="version" type="string"/>
+        <element label="Instance Name" max_length="200" name="vm_name" type="string"/>
+        <element label="Hardware Profile" max_length="250" name="vm_size" type="string"/>
+    </element>
+</database>

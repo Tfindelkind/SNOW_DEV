@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Application Profiles and Catalog Relations" max_length="40" name="x_nuta2_nutanix_ca_catalog_item_and_application_profile_relation" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="Application Profile" max_length="32" name="application_profile" reference="x_nuta2_nutanix_ca_application_profile" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" label="Catalog Item" max_length="32" name="catalog_item" reference="sc_cat_item" type="reference"/>
+        <element label="Providers" max_length="1000" name="providers" type="string"/>
+        <index name="index">
+            <element name="application_profile"/>
+        </index>
+        <index name="index2">
+            <element name="catalog_item"/>
+        </index>
+    </element>
+</database>

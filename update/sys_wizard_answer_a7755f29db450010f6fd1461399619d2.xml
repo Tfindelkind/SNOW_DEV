@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_wizard_answer">
+    <sys_wizard_answer action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <answer>Applications</answer>
+        <button_label/>
+        <dependent_value/>
+        <element/>
+        <name>Applications</name>
+        <next_question/>
+        <order>100</order>
+        <payload_name/>
+        <question display_value="Base Configuration Item" name="Base Configuration Item">8e160878db010010f6fd1461399619b6</question>
+        <roles/>
+        <script/>
+        <sys_class_name>sys_wizard_answer</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-11-11 11:24:54</sys_created_on>
+        <sys_id>a7755f29db450010f6fd1461399619d2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Applications</sys_name>
+        <sys_package display_value="SSP" source="x_423271_ssp">e72f4761dbc10010f6fd146139961973</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_wizard_answer_a7755f29db450010f6fd1461399619d2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-11-11 11:24:54</sys_updated_on>
+        <table/>
+        <target_url>x_nuta2_nutanix_ca_nutanix_calm_application.do</target_url>
+        <type>1</type>
+    </sys_wizard_answer>
+</record_update>

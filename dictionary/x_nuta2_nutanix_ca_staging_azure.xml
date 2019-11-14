@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="x_nuta2_nutanix_ca_nutanix_staging_cloud_providers" label="Staging Azure" max_length="40" name="x_nuta2_nutanix_ca_staging_azure" type="collection"/>
+</database>

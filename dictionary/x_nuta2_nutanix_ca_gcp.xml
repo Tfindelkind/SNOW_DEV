@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="x_nuta2_nutanix_ca_nutanix_cloud_providers" label="GCP" max_length="40" name="x_nuta2_nutanix_ca_gcp" type="collection">
+        <element label="Service Account" max_length="500" name="email" type="string"/>
+        <element label="Machine Type" max_length="250" name="machine_type" type="string"/>
+        <element label="Instance Name" max_length="250" name="provider_name" type="string"/>
+        <element label="Provider Type" max_length="40" name="provider_type" type="string"/>
+        <element label="Security Group List" max_length="500" name="security_group_list" type="string"/>
+        <element label="SSH Keys" max_length="500" name="ssh_keys" type="string"/>
+        <element label="Startup script" max_length="250" name="start_up_script" type="string"/>
+        <element label="Zone" max_length="250" name="zone" type="string"/>
+    </element>
+</database>

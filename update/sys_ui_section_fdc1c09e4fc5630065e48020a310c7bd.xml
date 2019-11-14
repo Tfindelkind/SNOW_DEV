@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="Properties" section_id="fdc1c09e4fc5630065e48020a310c7bd" sys_domain="global" table="x_nuta2_nutanix_ca_calm_plugin_configuration" version="3" view="">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>create_alerts</element>
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2019-03-28 05:51:27</sys_created_on>
+            <sys_id>50beb300db24b300129273278c961925</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Properties" display_value="Properties" name="x_nuta2_nutanix_ca_calm_plugin_configuration" sys_domain="global" view="Default view">fdc1c09e4fc5630065e48020a310c7bd</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2019-03-28 05:51:27</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.split</element>
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2019-03-28 05:51:27</sys_created_on>
+            <sys_id>18beb300db24b300129273278c961925</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Properties" display_value="Properties" name="x_nuta2_nutanix_ca_calm_plugin_configuration" sys_domain="global" view="Default view">fdc1c09e4fc5630065e48020a310c7bd</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2019-03-28 05:51:27</sys_updated_on>
+            <sys_user/>
+            <type>.split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>log_verbosity</element>
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2019-03-28 05:51:27</sys_created_on>
+            <sys_id>98beb300db24b300129273278c961925</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Properties" display_value="Properties" name="x_nuta2_nutanix_ca_calm_plugin_configuration" sys_domain="global" view="Default view">fdc1c09e4fc5630065e48020a310c7bd</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2019-03-28 05:51:27</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>Properties</caption>
+            <header>false</header>
+            <name>x_nuta2_nutanix_ca_calm_plugin_configuration</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>nitin</sys_created_by>
+            <sys_created_on>2018-10-11 11:33:02</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>fdc1c09e4fc5630065e48020a310c7bd</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_name>Properties</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+            <sys_update_name>sys_ui_section_fdc1c09e4fc5630065e48020a310c7bd</sys_update_name>
+            <sys_updated_by>nitin</sys_updated_by>
+            <sys_updated_on>2018-10-12 06:51:13</sys_updated_on>
+            <sys_user/>
+            <title>true</title>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_map">
+    <sys_transform_map action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <copy_empty_fields>false</copy_empty_fields>
+        <create_new_record_on_empty_coalesce_fields>false</create_new_record_on_empty_coalesce_fields>
+        <enforce_mandatory_fields>No</enforce_mandatory_fields>
+        <name>Nutanix Calm Application - Map</name>
+        <order>100</order>
+        <run_business_rules>false</run_business_rules>
+        <run_script>true</run_script>
+        <script><![CDATA[(function transformRow(source, target, map, log, isUpdate) {
+
+	var utils = new Nutanix_Calm_Utils();
+	var logger = new Nutanix_Calm_Logger();
+	
+	// inserting into action related table
+	if(source.action_list){
+		
+		var parseAction = JSON.parse(source.action_list);
+		for(var i = 0; i<parseAction.length; i++){
+			
+			var action_name = ' ';
+			var aname = ' ';
+			var grAction = new GlideRecord(utils.configuration.table.NutanixCalmAction);
+			grAction.addQuery('uuid',parseAction[i].uuid);
+			grAction.query();
+			if(grAction.next()){
+				//gs.info("Update: "+parseAction[i].uuid);
+				
+				grAction.name = parseAction[i].name;
+				
+				action_name = parseAction[i].name;
+				
+				aname = action_name.replace('action_','').replace('_',' ');
+				//alert(aname.charAt(0).toUpperCase() + aname.slice(1).replace('_',' '));
+				aname = aname.split(" ");
+				for (var j = 0, x = aname.length; j < x; j++) {
+					aname[j] = aname[j][0].toUpperCase() + aname[j].substr(1);
+				}
+				
+				grAction.action_name = aname.join(" ");				
+				grAction.uuid = parseAction[i].uuid;
+				grAction.state = parseAction[i].state;
+				grAction.critical = parseAction[i].critical;
+				grAction.type = parseAction[i].type;
+				grAction.description = parseAction[i].description;
+				grAction.parent_uuid = source.uuid;
+				grAction.parent_name = source.name;
+				
+				var actionVariablesJSON = [];
+				var k = 0;
+				var parsedVariableList = parseAction[i].runbook.variable_list;
+				var parsedVariableListLength = parseAction[i].runbook.variable_list.length;
+				
+				while(k < parsedVariableListLength) {
+					
+					if(parsedVariableList[k].editables.value) {
+						var str = '{"name":"'+ parsedVariableList[k].name+""+'","value":"'+ parsedVariableList[k].value+""+'","type":"'+parsedVariableList[k].type+'","runtime":true}';
+						actionVariablesJSON.push(str);
+					}
+					else {
+						var str = '{"name":"'+ parsedVariableList[k].name+""+'","value":"'+ parsedVariableList[k].value+""+'","type":"'+parsedVariableList[k].type+'","runtime":false}';
+						actionVariablesJSON.push(str);
+					}
+					k++;
+				}
+				grAction.action_variables = actionVariablesJSON.toString();
+				
+				grAction.update();
+				
+			} else {
+				//gs.info("Insert: "+parseAction[i].uuid);
+				
+				grAction.initialize();
+				
+				grAction.name = parseAction[i].name;
+				
+				action_name = parseAction[i].name;
+				
+				aname = action_name.replace('action_','').replace('_',' ');
+				//alert(aname.charAt(0).toUpperCase() + aname.slice(1).replace('_',' '));
+				aname = aname.split(" ");
+				
+				for (var j = 0, x = aname.length; j < x; j++) {
+					aname[j] = aname[j][0].toUpperCase() + aname[j].substr(1);
+				}
+				
+				grAction.action_name = aname.join(" ");				
+				
+				grAction.uuid = parseAction[i].uuid;
+				grAction.state = parseAction[i].state;
+				grAction.critical = parseAction[i].critical;
+				grAction.type = parseAction[i].type;
+				grAction.description = parseAction[i].description;
+				grAction.parent_uuid = source.uuid;
+				grAction.parent_name = source.name;
+				
+				var actionVariablesJSON = [];
+				var k = 0;
+				var parsedVariableList = parseAction[i].runbook.variable_list;
+				var parsedVariableListLength = parseAction[i].runbook.variable_list.length;
+				
+				while(k < parsedVariableListLength) {
+					
+					if(parsedVariableList[k].editables.value) {
+						var str = '{"name":"'+ parsedVariableList[k].name+""+'","value":"'+ parsedVariableList[k].value+""+'","type":"'+parsedVariableList[k].type+'","runtime":true}';
+						actionVariablesJSON.push(str);
+					}
+					else {
+						var str = '{"name":"'+ parsedVariableList[k].name+""+'","value":"'+ parsedVariableList[k].value+""+'","type":"'+parsedVariableList[k].type+'","runtime":false}';
+						actionVariablesJSON.push(str);
+					}
+					k++;
+				}
+				grAction.action_variables = actionVariablesJSON.toString();
+				grAction.insert();
+			}
+		}
+	}
+	
+	// inserting into Deployment related table
+	if(source.deployment_list){
+		
+		var parseDeploy = JSON.parse(source.deployment_list);
+		
+		for(var j = 0; j<parseDeploy.length; j++){
+			
+			var grDeploy = new GlideRecord(utils.configuration.table.AppDeployment);
+			grDeploy.addQuery('uuid',parseDeploy[j].uuid);
+			grDeploy.query();
+			if(grDeploy.next()){
+				//gs.info("Update: "+grDeploy[j].uuid);
+				
+				grDeploy.name = parseDeploy[j].name;
+				grDeploy.uuid = parseDeploy[j].uuid;
+				grDeploy.description = parseDeploy[j].description;
+				grDeploy.min_replicas = parseDeploy[j].min_replicas;
+				grDeploy.current_replicas = parseDeploy[j].current_replicas;
+				grDeploy.max_replicas = parseDeploy[j].max_replicas;
+				grDeploy.parent_uuid = source.uuid;
+				grDeploy.parent_name = source.name;
+				grDeploy.update();
+				
+			} else {
+				//gs.info("Insert: "+parseDeploy[j].uuid);
+				
+				grDeploy.initialize();
+				grDeploy.name = parseDeploy[j].name;
+				grDeploy.uuid = parseDeploy[j].uuid;
+				grDeploy.description = parseDeploy[j].description;
+				grDeploy.min_replicas = parseDeploy[j].min_replicas;
+				grDeploy.current_replicas = parseDeploy[j].current_replicas;
+				grDeploy.max_replicas = parseDeploy[j].max_replicas;
+				grDeploy.parent_uuid = source.uuid;
+				grDeploy.parent_name = source.name;
+				grDeploy.insert();
+			}
+			
+			var elements = (parseDeploy[j].substrate_configuration && parseDeploy[j].substrate_configuration.element_list) ? parseDeploy[j].substrate_configuration.element_list : {} ;
+			//var l = 1;
+			var name;
+			
+			for(var p in elements){
+				if(elements.length>1)
+					target.nutanix_ip_address[elements[p].name+'['+p+']'] = elements[p].address+'';
+				else
+					target.nutanix_ip_address[elements[p].name+''] = elements[p].address+'';
+			}
+			
+// 			for(var p = 0; p < elements.length ; p++){
+// 				if(target.nutanix_ip_address[elements[p].name+'']){
+// 					name = elements[p].name+'_'+l;
+// 					l++;
+// 				}else
+// 					name = elements[p].name+'';
+// 				var address = elements[p].address+'';
+// 				target.nutanix_ip_address[name] = address;
+// 			}
+		}
+	}
+	
+	if(source.owner_reference)
+		target.applicatoin_created_by = JSON.parse(source.owner_reference).name;
+	
+	target.assigned_to = (target.assigned_to)?target.assigned_to:source.applicatoin_created_by;
+	
+	if(source.app_blueprint_reference){
+		var parseBp = JSON.parse(source.app_blueprint_reference);
+		//gs.info(parseBp.name+" "+parseBp.uuid);
+		target.blueprint_name = parseBp.name;
+		target.blueprint_uuid = parseBp.uuid;
+	}
+})(source, target, map, log, action==="update");]]></script>
+        <source_table>x_nuta2_nutanix_ca_nutanix_staging_application</source_table>
+        <sys_class_name>sys_transform_map</sys_class_name>
+        <sys_created_by>mumtaz.ansari</sys_created_by>
+        <sys_created_on>2018-10-11 10:34:39</sys_created_on>
+        <sys_id>a3243fc637c12300d27b8cf6c3990e6b</sys_id>
+        <sys_mod_count>99</sys_mod_count>
+        <sys_name>Nutanix Calm Application - Map</sys_name>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_transform_map_a3243fc637c12300d27b8cf6c3990e6b</sys_update_name>
+        <sys_updated_by>girish.gyani</sys_updated_by>
+        <sys_updated_on>2019-05-16 17:06:17</sys_updated_on>
+        <target_table>x_nuta2_nutanix_ca_nutanix_calm_application</target_table>
+    </sys_transform_map>
+</record_update>

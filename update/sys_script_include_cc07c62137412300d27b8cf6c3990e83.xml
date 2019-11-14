@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_nuta2_nutanix_ca.Nutanix_Calm_Utils</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Nutanix_Calm_Utils</name>
+        <script><![CDATA[var Nutanix_Calm_Utils = Class.create();
+Nutanix_Calm_Utils.prototype = {
+	initialize: function() {
+		this.logger = new Nutanix_Calm_Logger();
+		/*
+		How to use alias in script
+		1. Add new alias in either of table,api,property
+		2. In respective script includes, instantiate Nutanix_Calm_Utils var apputil
+		3. Referance specific value as apputil.configuration.<api/table/property>.<key-name>
+ 		*/
+		this.version = gs.getProperty('x_nuta2_nutanix_ca.calm_version');
+		this.configuration = {
+			
+			"api" :{
+				"getProjectList": "/projects/list",
+				"getBlueprintList": "/blueprints/list",
+				"getBlueprintDetail": "/blueprints/",
+				"getAppList": "/apps/list",
+				"getAppDetail": "/apps/",
+				"getMarketplaceItemDetail" : "/calm_marketplace_items/",
+				"getCategories" : "/categories/AppFamily/list",
+				"getIcon" : "/static/app_icons/",
+				"getEnvironment" : "/environments/",
+				"getUsersList" : "/users/list",
+				"getRolesList" : "/roles/list",
+				"projectInternal" : "/projects_internal",
+				"directoryServices" : "/directory_services/list",
+				"getMarketplaceItem" : "/calm_marketplace_items/list",
+				"getGroupsList" : "/user_groups/list",
+				"proxyLogin" : "/proxy_login",
+				"getSubnets" : "/subnets/list"
+			},
+			"table":{
+				"NutanixStagingApplication": "x_nuta2_nutanix_ca_nutanix_staging_application",
+				"NutanixCalmAction": "x_nuta2_nutanix_ca_nutanix_calm_action",
+				"NutanixCalmApplication": "x_nuta2_nutanix_ca_nutanix_calm_application",
+				"ActionWorkflowStaging": "x_nuta2_nutanix_ca_app_action_workflow_trigger",
+				"AppDeployment": "x_nuta2_nutanix_ca_application_deployment",
+				"Blueprint": "x_nuta2_nutanix_ca_nutanix_blueprint",
+				"Project": "x_nuta2_nutanix_ca_nutanix_project",
+				"CalmPluginConfig": "x_nuta2_nutanix_ca_calm_plugin_configuration",
+				"stagingProject": "x_nuta2_nutanix_ca_nutanix_staging_project",
+				"stagingBlueprints": "x_nuta2_nutanix_ca_nutanix_staging_blueprints",
+				"processQueue": "x_nuta2_nutanix_ca_nutanix_process_queue",
+				"applicationProfiles": "x_nuta2_nutanix_ca_application_profile",
+				"varaiblesTable": "item_option_new",
+				"variableSetTable": "io_set_item",
+				"stagingMarketplaceItem" : "x_nuta2_nutanix_ca_nutanix_staging_marketplace_items",
+				"catalog": "sc_catalog",
+				"category" : "sc_category",
+				"sysUiAction" : "sys_ui_action",
+				"catalogProfileRelation": "x_nuta2_nutanix_ca_catalog_item_and_application_profile_relation",
+				"variablesProperties": "x_nuta2_nutanix_ca_catalog_variables_properties",
+				"catalogUserCriteria": "sc_cat_item_user_criteria_mtom",
+				"userCriteria": "user_criteria",
+				"catalogProjectRelation":"x_nuta2_nutanix_ca_nutanix_calm_projects_blueprints_relationship",
+				"Credentials": "x_nuta2_nutanix_ca_nutanix_calm_credential",
+				"appRunlogs": "x_nuta2_nutanix_ca_nutanix_calm_app_runlogs",
+				"stagingEnvironment" : "x_nuta2_nutanix_ca_nutanix_staging_environment",
+				"runtimeConfig": "x_nuta2_nutanix_ca_nutanix_runtime_configuration",
+				"catalogClientScript": "catalog_script_client",
+				"catalogUIPolicy": "catalog_ui_policy",
+				"catItem": "sc_cat_item",
+				"awsStorage" : "x_nuta2_nutanix_ca_nutanix_storage",
+				"awsTag" : "x_nuta2_nutanix_ca_nutanix_aws_tag_list",
+				"StagingGCP" : "x_nuta2_nutanix_ca_staging_gcp",
+				"blankDisks" : "x_nuta2_nutanix_ca_blank_disks",
+				"networking" : "x_nuta2_nutanix_ca_networking",
+				"disks"      : "x_nuta2_nutanix_ca_disks",
+				"stagingAzure" : "x_nuta2_nutanix_ca_staging_azure",
+				"security" : "x_nuta2_nutanix_ca_secret",
+				"nw_profiles" : "x_nuta2_nutanix_ca_network_profiles",
+				"dataDisk" : "x_nuta2_nutanix_ca_data_disk",
+				"subnet" : "x_nuta2_nutanix_ca_subnet"
+			},
+		};
+	},
+	
+	// Use this method to make Calm API client call to the Nutanix for JSON response
+	makeCalmApiCall: function(httpMethod, endpoint, body){                           //Original makeCalmApiCall
+		try {
+			var grConfig = new GlideRecord(this.configuration.table.CalmPluginConfig);
+			grConfig.addQuery('sys_id', gs.getProperty('x_nuta2_nutanix_ca.nutanix.application.properties.sys_id'));
+			grConfig.query();
+			if(grConfig.next()){
+				//this.Catalog = grConfig.service_catalog;
+				this.midServer = grConfig.mid_server;
+				this.calmInstanceURL = grConfig.calm_instance+'';
+				this.userName = grConfig.calm_admin_username+'';
+				this.password = grConfig.calm_admin_password.getDecryptedValue()+'';
+			}
+			
+			var endpointURL = this.calmInstanceURL + gs.getProperty('x_nuta2_nutanix_ca.API_Prefix') + endpoint;
+			
+			var request = new sn_ws.RESTMessageV2();
+			request.setRequestHeader("Accept","application/json");
+			request.setRequestHeader("Content-Type","application/json");
+			request.setBasicAuth(this.userName, this.password);
+			request.setHttpMethod(httpMethod);
+			request.setMIDServer(this.midServer.getDisplayValue()+'');
+			request.setEndpoint(endpointURL);
+			if(body)
+				request.setRequestBody(body);
+			
+			if(this.midServer.status =='Up' && this.midServer.validated == 'true'){
+				var response = request.execute();
+				this.logger.debug(' MID Server '+this.midServer.getDisplayValue()+''+ ' is Up ');
+				return response;
+			} else {
+				this.logger.error(' MID Server '+this.midServer.getDisplayValue()+''+ ' is Down / Not Validated ');
+				return false;
+			}
+		} catch(err){
+			this.logger.error("Make Calm API Call [makeCalmApiCall] Error: " + err);
+		}
+	},
+	
+	makeProxyCall: function(httpMethod, endpoint, body, userId) {                //API Proxy Call
+		try {
+			
+			var userGr = new GlideRecord('sys_user');
+			userGr.get(userId);
+			var proxyURL = this.configuration.api.proxyLogin + '';
+			var calmUserName = userGr.email + '';
+			calmUserName = calmUserName.toLowerCase() + '';
+			var proxyBody = {"proxy_for_username":calmUserName};
+			var proxyResponse = this.makeCalmApiCall('POST', proxyURL, this.stringify(proxyBody));
+				
+			if(proxyResponse.getStatusCode() == '200' || proxyResponse.getStatusCode() == '201') {
+				var parsedProxyResp = this.parse(proxyResponse.getBody());
+				var sessionId = parsedProxyResp.ntnx_igw_session + '';
+				var idExpiresIn = parsedProxyResp.expires + '';
+				var grConfig = new GlideRecord(this.configuration.table.CalmPluginConfig);
+				grConfig.addQuery('sys_id', gs.getProperty('x_nuta2_nutanix_ca.nutanix.application.properties.sys_id'));
+				grConfig.query();
+				if(grConfig.next()) {
+					this.midServer = grConfig.mid_server;
+					this.calmInstanceURL = grConfig.calm_instance+'';
+				}
+			
+				var domain = this.calmInstanceURL.replace('https://','').replace(':9440','');
+				var cookie = 'NTNX_IGW_SESSION='+sessionId+'; path=/; domain='+domain+'; Secure; HttpOnly; Expires='+this.proxyUTCConverter(idExpiresIn)+';';
+				var endpointURL = this.calmInstanceURL + gs.getProperty('x_nuta2_nutanix_ca.API_Prefix') + endpoint;
+				
+				var proxyRequest = new sn_ws.RESTMessageV2();
+				proxyRequest.setRequestHeader("Accept","application/json");
+				proxyRequest.setRequestHeader("Content-Type","application/json");
+				proxyRequest.setRequestHeader("Cookie", cookie);
+				proxyRequest.setHttpMethod(httpMethod);
+				proxyRequest.setMIDServer(this.midServer.getDisplayValue()+'');
+				proxyRequest.setEndpoint(endpointURL);
+				if(body)
+					proxyRequest.setRequestBody(body);
+				
+				if(this.midServer.status =='Up' && this.midServer.validated == 'true') {
+					proxyResponse = proxyRequest.execute();
+					this.logger.debug(' MID Server '+this.midServer.getDisplayValue()+''+ ' is Up ');
+					return proxyResponse;
+				} else {
+					this.logger.error(' MID Server '+this.midServer.getDisplayValue()+''+ ' is Down / Not Validated ');
+					return false;
+				}
+				
+			} else {
+				this.logger.error("Error in makeProxyCall API Call [makeProxyCall] Error: " +proxyResponse.getBody());
+			}
+		} catch(err) {
+			this.logger.error("Make Proxy API Call [makeProxyCall] Error: " + err);
+		}	
+	},
+	
+	makeIntermediateApiCall :function(httpMethod, endpoint, body, userId) {                //API intermediate Proxy Call
+			
+		if(this.version < 2.7) {
+			return this.makeCalmApiCall(httpMethod, endpoint, body);
+		}
+		else {
+			
+			var grUser = new GlideRecord('sys_user_has_role');
+			grUser.addEncodedQuery('role.name=x_nuta2_nutanix_ca.calm_admin^ORrole.name=admin^user='+userId);
+						
+			grUser.query();
+			
+			if(grUser.next())//user_name.hasRole("x_nuta2_nutanix_ca.calm_admin")) 
+			{
+				return this.makeCalmApiCall(httpMethod, endpoint, body);
+			}
+			else {
+				return this.makeProxyCall(httpMethod, endpoint, body, userId);
+			}
+		}
+	},
+	
+	makeCalmApiCallForIcon :function(httpMethod, endpoint, body , sysId){
+		try {
+			var grConfig = new GlideRecord(this.configuration.table.CalmPluginConfig);
+			grConfig.addQuery('sys_id', gs.getProperty('x_nuta2_nutanix_ca.nutanix.application.properties.sys_id'));
+			grConfig.query();
+			if(grConfig.next()){
+				//this.Catalog = grConfig.service_catalog;
+				this.midServer = grConfig.mid_server;
+				this.calmInstanceURL = grConfig.calm_instance+'';
+				this.userName = grConfig.calm_admin_username+'';
+				this.password = grConfig.calm_admin_password.getDecryptedValue()+'';
+			}
+			
+			var endpointURL = this.calmInstanceURL + gs.getProperty('x_nuta2_nutanix_ca.API_Prefix') + endpoint;
+			var tablename   = 'sc_cat_item';
+			var recordSysId =  sysId;
+			var filename    = 'picture';
+			var request = new sn_ws.RESTMessageV2();
+			request.setBasicAuth(this.userName, this.password);
+			request.setHttpMethod(httpMethod);
+			request.setMIDServer(this.midServer.getDisplayValue()+'');
+			request.setEndpoint(endpointURL);
+			request.saveResponseBodyAsAttachment(tablename, recordSysId, filename);
+			if(body)
+				request.setRequestBody(body);
+			
+			if(this.midServer.status =='Up' && this.midServer.validated == 'true'){
+				var response = request.execute();
+				this.logger.debug(' MID Server '+this.midServer.getDisplayValue()+''+ ' is Up ');
+				return response;
+			} else {
+				this.logger.error(' MID Server '+this.midServer.getDisplayValue()+''+ ' is Down / Not Validated ');
+				return false;
+			}
+		} catch(err){
+			this.logger.error("Make API Call [makeCalmApiCallForIcon] Error: " + err);
+		}
+	},
+	
+	///changes
+	
+	generateRequestBody : function(name,version,presetOffset,pageBreaker){
+
+		if(version < 2.7){
+			var responseBody = "";
+			switch (name) {
+
+			case "startImportMPI" : responseBody = {
+										"kind": "marketplace_item",
+										"offset": 0,
+										"length": 1
+									};
+									return responseBody;
+
+			case "importMPIData"  : responseBody = {
+										"kind": "marketplace_item",
+										"offset": presetOffset,
+										"length": pageBreaker
+									};
+									return responseBody;
+
+			default : 				this.logger.error("Inside Nutanix_Calm_Utils.generateRequestBody :: " +name +" not found");
+			}
+		}else{
+			var responseBody = "";
+			switch (name) {
+		
+				case "startImportMPI" : responseBody = {
+											"kind": "marketplace_item",
+											"offset": 0,
+											"filter" : "app_state==PUBLISHED",
+											"length": 1
+										};
+										return responseBody;
+
+				case "importMPIData"  : responseBody = {
+											"kind": "marketplace_item",
+											"offset": presetOffset,
+											"filter" : "app_state==PUBLISHED",
+											"length": pageBreaker
+										};
+										return responseBody;
+
+				default : 				this.logger.error("Inside Nutanix_Calm_Utils.generateRequestBody :: " +name +" not found");
+
+			}
+		}
+	},
+	
+	///
+	//Show/Hide 'Sync' ui action on authentication success or failure
+	showHideSyncUiAction: function(SyncStatus){
+		try {
+			var grAction = new GlideRecord(this.configuration.table.sysUiAction);
+			grAction.addQuery('action_name','nutanix_sync');
+			grAction.query();
+			if(grAction.next()){
+				grAction.form_button = SyncStatus;
+				grAction.update();
+			}
+		} catch(e){
+			this.logger.error("Inside Nutanix_Calm_Utils.showHideSyncUiAction Error: " + e);
+		}
+		
+	},
+	
+	//Show/Hide 'Save Properties' ui action on MID Server Down/not validated
+	showHideSaveUiAction: function(SaveStatus){
+		try {
+			var grAction = new GlideRecord(this.configuration.table.sysUiAction);
+			grAction.addQuery('action_name','save_properties');
+			grAction.query();
+			if(grAction.next()){
+				grAction.form_button = SaveStatus;
+				grAction.update();
+			}
+		} catch(e){
+			this.logger.error("Inside Nutanix_Calm_Utils.showHideSaveUiAction Error: " + e);
+		}
+		
+	},
+	
+	
+	updateCatalogName: function(name){
+		var gr = new GlideRecord(this.configuration.table.catalog);
+		gr.addQuery('sys_id', gs.getProperty('x_nuta2_nutanix_ca.nutanix_catalog_sysId')+'' );
+		gr.query();
+		if(gr.next()){
+			gr.title = name+'';
+			gr.update();
+		}else{
+			gr.initialize();
+			gr.title = name;
+			//gr.desktop_image = '';   //Image needed to be added.
+			gr.insert();
+		}
+	},
+	
+	//('importApplications', 'POST', '/apps/list', 'payload');
+	insertIntoQueue: function(topic, method, parameter, payload, process, desc){
+		var gr = new GlideRecord(this.configuration.table.processQueue);
+		gr.initialize();
+		gr.topic = topic+'';
+		gr.method = method+'';
+		gr.parameter = parameter+'';
+		gr.payload = payload+'';
+		gr.process_name = process+'';
+		gr.description = desc+'';
+		gr.state = "ready";
+		gr.insert();
+	},
+	
+	// Inserts app run logs into App Runlogs table
+	insertAppRunlogs: function(parsedJson){
+		try{
+			var grRunlogs = new GlideRecord(this.configuration.table.appRunlogs);
+			grRunlogs.initialize();
+			
+			//grRunlogs.name = parsedJson.status.action_reference.name;
+			var action_name = parsedJson.status.action_reference.name;
+			aname = action_name.replace('action_','').replace('_',' ');
+			aname = aname.split(" ");
+			for (var j = 0, x = aname.length; j < x; j++) {
+				aname[j] = aname[j][0].toUpperCase() + aname[j].substr(1);
+			}
+			grRunlogs.name = aname.join(" ");
+			
+			grRunlogs.uuid = parsedJson.metadata.uuid;
+			grRunlogs.description = parsedJson.status.description;
+			grRunlogs.app_uuid = parsedJson.status.application_reference.uuid;
+			grRunlogs.app_name = parsedJson.status.application_reference.name;
+			grRunlogs.is_runlog_archived = parsedJson.status.is_runlog_archived;
+			grRunlogs.is_critical = parsedJson.status.is_critical;
+			grRunlogs.state = parsedJson.status.state;
+			grRunlogs.type = parsedJson.status.type;
+			grRunlogs.kind = parsedJson.metadata.kind;
+			grRunlogs.last_update_time = this.calmDateConvertor(parsedJson.metadata.last_update_time);
+			grRunlogs.creation_time = this.calmDateConvertor(parsedJson.metadata.creation_time);
+			grRunlogs.insert();
+			
+		} catch(e) {
+			this.logger.error("Error occured while inserting app run logs, Nutanix_Calm_Utils.insertAppRunlogs: "+e);
+		}
+	},
+	
+	// Calm "last_update_time", "creation_time" date convertor specific to SNOW datetime format
+	calmDateConvertor: function(getdate){
+		try{
+			var date = new Date(getdate/1000);
+			var year = date.getUTCFullYear();
+			var month = date.getUTCMonth()+1; // getMonth() is zero-indexed, so we'll increment to get the correct month number
+			var day = date.getUTCDate();
+			var hours = date.getUTCHours();
+			var minutes = date.getUTCMinutes();
+			var seconds = date.getUTCSeconds();
+			var lastUpdate = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes+ ':' +seconds;
+			return lastUpdate;
+		} catch(e) {
+			this.logger.error("Error occured inside Nutanix_Calm_Utils.calmDateConvertor: "+e);
+		}
+	},
+	
+	parse: function(str){
+		if(str)
+			return JSON.parse(str);
+		
+		return '';
+	},
+	
+	stringify: function(str){
+		if(str)
+			return JSON.stringify(str);
+		
+		return '';
+	},
+	
+	proxyUTCConverter: function(timeStamp) {
+		var d = new Date(timeStamp*1000);
+		return d.toGMTString();
+	},
+		
+	type: 'Nutanix_Calm_Utils'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>mumtaz.ansari</sys_created_by>
+        <sys_created_on>2018-10-09 13:20:11</sys_created_on>
+        <sys_id>cc07c62137412300d27b8cf6c3990e83</sys_id>
+        <sys_mod_count>148</sys_mod_count>
+        <sys_name>Nutanix_Calm_Utils</sys_name>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_script_include_cc07c62137412300d27b8cf6c3990e83</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-05-02 17:10:31</sys_updated_on>
+    </sys_script_include>
+</record_update>

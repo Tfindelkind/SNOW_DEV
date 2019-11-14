@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Data Disk" max_length="40" name="x_nuta2_nutanix_ca_data_disk" type="collection">
+        <element label="Disk Caching Type" max_length="250" name="caching_type" type="string"/>
+        <element label="Disk LUN" max_length="40" name="lun" type="string"/>
+        <element label="Disk Name" max_length="250" name="name" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Provider" max_length="32" name="provider" reference="x_nuta2_nutanix_ca_nutanix_cloud_providers" type="reference"/>
+        <element label="Size (GiB)" max_length="40" name="size_in_gb" type="string"/>
+        <element label="Storage Type" max_length="250" name="storage_type" type="string"/>
+        <index name="index">
+            <element name="provider"/>
+        </index>
+    </element>
+</database>

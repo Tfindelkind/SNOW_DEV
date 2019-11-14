@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[var actSysId = gel("act_sys_id").value;
+var act_var_JSON = gel("parsed_json").value;
+var actionName = gel("actName").value;
+
+var $j = jQuery.noConflict();
+
+function render_variables(answer){
+	
+	var parsed = JSON.parse(answer);
+	var parsed_length = parsed.length;
+	
+	var containerString = '';
+	for (var i = 0; i < parsed_length; i++) {
+		
+		if(parsed[i].runtime) {
+			
+			if(parsed[i].type=='LOCAL') {	
+				containerString += '<div class="form-group"><label style="margin-bottom: 7px;" class="control-label" id="'+parsed[i].name+'_label">'+parsed[i].name+'</label><input type="text" class="form-control" id="'+parsed[i].name+'_input" value="'+parsed[i].value+'"></div>';
+			}
+			else {
+				containerString += '<div class="form-group"><label style="margin-bottom: 7px;" class="control-label" id="'+parsed[i].name+'_label">'+parsed[i].name+'</label><input type="password" placeholder="*******" class="form-control" id="'+parsed[i].name+'_input" value="'+parsed[i].value+'"></div>';
+			}
+		}
+		else {
+			if(parsed[i].type=='LOCAL') {	
+				containerString += '<div class="form-group"><label style="margin-bottom: 7px;" class="control-label" id="'+parsed[i].name+'_label">'+parsed[i].name+'</label><input type="text" disabled="" class="form-control" id="'+parsed[i].name+'_input" value="'+parsed[i].value+'"></div>';
+			}
+			else {
+				containerString += '<div class="form-group"><label style="margin-bottom: 7px;" class="control-label" id="'+parsed[i].name+'_label">'+parsed[i].name+'</label><input type="password" placeholder="*******" disabled="" class="form-control" id="'+parsed[i].name+'_input" value="'+parsed[i].value+'"></div>';
+			}
+		}
+	}
+	//var htmlStr = '';
+	var buttonHTML = '<div class="modal-footer"><div class="row"><div class="col-sm-3 pull-right"><button class="btn btn-primary" id="runAct">Run</button><button class="btn btn-default" id="cancelAct">Cancel</button></div></div></div>';
+	
+	$j(".bodyData").html('');
+	$j(".bodyData").append(containerString+buttonHTML);
+	$j('#runAct').mousedown(runAction);
+	$j('#cancelAct').mousedown(cancelDialog);
+	/*$j(".bodyData").html('');
+	$j(".bodyData").append(bodyString+endString);*/
+}
+
+function runAction() {
+	
+	var parsedActJSON = JSON.parse(act_var_JSON);
+	var JSONlength = parsedActJSON.length;
+	var newJSON = [];
+	for(var i=0; i<JSONlength; i++) {
+		
+		if(parsedActJSON[i].type=='LOCAL') {
+			newJSON[i] = '{"name":"'+parsedActJSON[i].name+'","value":"'+$j("#"+parsedActJSON[i].name+"_input").val()+'"}';
+		}
+		else {
+			if($j("#"+parsedActJSON[i].name+"_input").val()=='')
+				newJSON[i] = '{"name":"'+parsedActJSON[i].name+'"}';
+			else
+				newJSON[i] = '{"name":"'+parsedActJSON[i].name+'","value":"'+$j("#"+parsedActJSON[i].name+"_input").val()+'"}';
+		}
+	}
+	callRunActions(newJSON.toString());
+		
+	}
+	
+	function cancelDialog() {
+		GlideDialogWindow.get().destroy();
+	}
+	
+	function callRunActions(modVarString) {
+		
+		var gajax = new GlideAjax('Run_App_Actions');
+		gajax.addParam('sysparm_name', 'runAction');
+		gajax.addParam('sysparm_actionsysid', actSysId);
+		gajax.addParam('sysparm_actionVars', modVarString);
+		gajax.getXML(getResponse);
+		
+		function getResponse(response) {
+			var answer = response.responseXML.documentElement.getAttribute("answer");
+		}
+		GlideDialogWindow.get().destroy();
+		g_form.addInfoMessage("Action "+actionName+" has started");
+	}
+	
+	
+	function submitActionVars() {
+		
+		render_variables(act_var_JSON);
+		
+	}]]></client_script>
+        <description>This is used to set runtime action variables</description>
+        <direct>false</direct>
+        <endpoint>x_nuta2_nutanix_ca_Set_Runtime_Action_Variables.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+	
+	<input type="hidden" name="act_sys_id" id="act_sys_id" value="${sysparm_sysId}"/>
+	<input type="hidden" name="parsed_json" id="parsed_json" value="${sysparm_actVarsArr}"/>
+	<input type="hidden" name="actName" id="actName" value="${sysparm_actName}"/>
+	
+	<body>
+		<script>
+			addLoadEvent( function() {
+			submitActionVars();
+			});
+		</script>
+	</body>
+	
+	<div class="bodyData">
+	</div>
+
+</j:jelly>]]></html>
+        <name>Set_Runtime_Action_Variables</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-02-19 10:11:58</sys_created_on>
+        <sys_id>a194ded4dbf32300bfa82a9a489619a9</sys_id>
+        <sys_mod_count>148</sys_mod_count>
+        <sys_name>Set_Runtime_Action_Variables</sys_name>
+        <sys_package display_value="Nutanix Calm" source="x_nuta2_nutanix_ca">3b7631654f452b001200e5201310c76b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Nutanix Calm">3b7631654f452b001200e5201310c76b</sys_scope>
+        <sys_update_name>sys_ui_page_a194ded4dbf32300bfa82a9a489619a9</sys_update_name>
+        <sys_updated_by>Bharat</sys_updated_by>
+        <sys_updated_on>2019-03-26 06:23:28</sys_updated_on>
+    </sys_ui_page>
+</record_update>

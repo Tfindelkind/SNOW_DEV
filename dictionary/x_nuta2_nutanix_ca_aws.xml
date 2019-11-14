@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="x_nuta2_nutanix_ca_nutanix_cloud_providers" label="AWS" max_length="40" name="x_nuta2_nutanix_ca_aws" type="collection">
+        <element label="Associate Public IP Address" max_length="250" name="associate_public_ip_address" type="string"/>
+        <element label="Availability Zone" max_length="250" name="availability_zone" type="string"/>
+        <element label="Availability Zone Reference" max_length="250" name="availability_zone_reference" type="string"/>
+        <element label="Image id" max_length="250" name="image_id" type="string"/>
+        <element label="Instance Profile Name" max_length="250" name="instance_profile_name" type="string"/>
+        <element label="Instance Type" max_length="250" name="instance_type" type="string"/>
+        <element label="Key Name" max_length="250" name="key_name" type="string"/>
+        <element label="Private IP Address" max_length="250" name="private_ip_address" type="string"/>
+        <element label="Instance Name" max_length="250" name="provider_name" type="string"/>
+        <element label="Provider Type" max_length="250" name="provider_type" type="string"/>
+        <element label="Region" max_length="250" name="region" type="string"/>
+        <element label="Security Group List" max_length="250" name="security_group_list" type="string"/>
+        <element label="State" max_length="250" name="specific_provider_state" type="string"/>
+        <element label="Subnet Id" max_length="250" name="subnet_id" type="string"/>
+        <element label="VPC id" max_length="250" name="vpc_id" type="string"/>
+    </element>
+</database>

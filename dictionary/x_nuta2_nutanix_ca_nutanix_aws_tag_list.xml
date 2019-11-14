@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Tag List" max_length="40" name="x_nuta2_nutanix_ca_nutanix_aws_tag_list" type="collection">
+        <element label="Key" max_length="250" name="key" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Provider" max_length="32" name="provider" reference="x_nuta2_nutanix_ca_nutanix_cloud_providers" type="reference"/>
+        <element label="Value" max_length="250" name="value" type="string"/>
+        <index name="index">
+            <element name="provider"/>
+        </index>
+    </element>
+</database>

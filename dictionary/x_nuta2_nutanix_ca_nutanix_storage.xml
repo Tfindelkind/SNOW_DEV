@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Storage" max_length="40" name="x_nuta2_nutanix_ca_nutanix_storage" type="collection">
+        <element label="Delete On Termination" max_length="250" name="delete_on_termination" type="string"/>
+        <element label="Device Name" max_length="250" name="device_name" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Is Root Disk" max_length="40" name="is_root_disk" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Provider" max_length="32" name="provider" reference="x_nuta2_nutanix_ca_aws" type="reference"/>
+        <element label="Size GB" max_length="250" name="size_gb" type="string"/>
+        <element label="Volume Type" max_length="250" name="volume_type" type="string"/>
+        <index name="index">
+            <element name="provider"/>
+        </index>
+    </element>
+</database>

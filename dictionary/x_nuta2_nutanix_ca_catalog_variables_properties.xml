@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Catalog Variables Properties" max_length="40" name="x_nuta2_nutanix_ca_catalog_variables_properties" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="Application Profile" max_length="32" name="application_profile" reference="x_nuta2_nutanix_ca_application_profile" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" label="Catalog Item" max_length="32" name="catalog_item" reference="sc_cat_item" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" label="Category Name" max_length="32" name="category_name" reference="item_option_new" type="reference"/>
+        <element label="Default Value" max_length="1000" name="default_value" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="isDisabled?" max_length="40" name="isdisabled" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="isProfileVariable" max_length="40" name="isprofilevariable" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="isServiceVariable" max_length="40" name="isservicevariable" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="isSupported" max_length="40" name="issupported" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Runtime Config" max_length="40" name="runtime_config" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Service Name" max_length="32" name="service_name" reference="item_option_new" type="reference"/>
+        <element label="UUID" max_length="50" name="uuid" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Variable" max_length="32" name="variable" reference="item_option_new" type="reference"/>
+        <index name="index">
+            <element name="category_name"/>
+        </index>
+        <index name="index2">
+            <element name="application_profile"/>
+        </index>
+        <index name="index3">
+            <element name="service_name"/>
+        </index>
+        <index name="index4">
+            <element name="catalog_item"/>
+        </index>
+        <index name="index5">
+            <element name="variable"/>
+        </index>
+    </element>
+</database>
